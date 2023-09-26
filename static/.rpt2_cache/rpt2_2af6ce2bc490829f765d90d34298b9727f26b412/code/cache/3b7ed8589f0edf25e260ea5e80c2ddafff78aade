@@ -1,0 +1,1 @@
+{"code":"import createReturnBtn from './return-btn/index';\r\nimport createDocumentItems from './document-item/index';\r\nexport { createReturnBtn, createDocumentItems, };\r\n","references":["/Users/roman/work/iwex-crm/iwex_crm/static/src/components/shared/return-btn/index.ts","/Users/roman/work/iwex-crm/iwex_crm/static/src/components/shared/document-item/index.ts"]}

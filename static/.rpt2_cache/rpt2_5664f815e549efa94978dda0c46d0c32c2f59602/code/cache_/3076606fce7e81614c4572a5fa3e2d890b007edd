@@ -1,0 +1,1 @@
+{"code":"import createSelects from './createSelects';\r\nexport default createSelects;\r\n","references":["/Users/roman/work/iwex-crm/iwex_crm/static/src/components/forms/select/createSelects.ts"]}

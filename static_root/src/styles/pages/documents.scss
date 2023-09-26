@@ -1,0 +1,81 @@
+.documents-page {
+
+  @media screen and (min-width: $screen-s) {
+    margin: 48px 60px 63px;
+    background-color: #fff;
+    box-shadow: var(--default-box-shadow);
+    padding: 40px 30px 116px;
+    min-height: calc(100vh - 111px - 75px);
+    box-sizing: border-box;
+    position: relative;
+  }
+
+  &__title {
+    padding-left: 32px;
+    font-weight: 600;
+    font-size: 18px;
+    line-height: 25px;
+    background-repeat: no-repeat;
+    background-size: 24px 24px;
+    background-position: 0 center;
+    background-image: url("https://iwex-crm-bucket.s3.amazonaws.com/static/images/icons/documents.svg");
+    margin-bottom: 12px;
+
+    @media screen and (min-width: $screen-s) {
+      display: inline-block;
+      margin-top: 20px;
+      margin-bottom: 20px;
+    }
+
+  }
+
+  &__subtitle {
+    display: block;
+    font-size: 12px;
+    line-height: 16px;
+    margin-top: -8px;
+
+    @media screen and (min-width: $screen-s) {
+      display: inline-block;
+      font-size: 11px;
+    }
+  }
+
+  &__list {
+    margin-top: 20px;
+
+    @media screen and (min-width: $screen-s) {
+      grid-template-columns: 1fr 1fr 1fr;
+      grid-column-gap: 34px;
+      margin-top: 0;
+    }
+
+  }
+
+  &__footer {
+    margin: 32px auto 0;
+    font-size: 12px;
+    line-height: 16px;
+    text-align: center;
+    padding-bottom: 60px;
+    width: 80%;
+
+    @media screen and (min-width: $screen-s) {
+      width: 100%;
+      font-size: 25px;
+      line-height: 30px;
+      text-align: center;
+      background-image: url("https://iwex-crm-bucket.s3.amazonaws.com/static/images/icons/exclamation_point.svg");
+      width: 500px;
+      margin: 70px auto 0;
+      padding-left: 40px;
+      padding-bottom: 0;
+      background-repeat: no-repeat;
+      background-size: 14px 50px;
+      font-size: 24px;
+      line-height: 33px;
+      font-weight: 300;
+      background-position: 0 center;
+    }
+  }
+}

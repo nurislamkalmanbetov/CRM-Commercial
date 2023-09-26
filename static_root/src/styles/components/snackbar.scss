@@ -1,0 +1,68 @@
+.snackbar {
+  position: fixed;
+  border-radius: 4px;
+  bottom: -60px;
+  height: 44px;
+  width: calc(100% - 8px * 2);
+  padding: 0 16px;
+  box-sizing: border-box;
+  margin: 0 8px;
+  box-shadow: var(--default-box-shadow);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #ccc;
+  z-index: 5;
+  opacity: 0;
+  transition: all .3s ease;
+
+  @media screen and (min-width: $screen-s) {
+    width: auto;
+    max-width: 768px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 0 0 0 25px;
+  }
+
+  &_show {
+    opacity: 1;
+    bottom: 8px
+  }
+
+  &_success {
+    background-color: var(--green-color);
+  }
+
+  &_danger {
+    background-color: var(--red-color);
+  }
+
+  &_warning {
+    background-color: var(--gold-color);
+  }
+  
+
+  &__text {
+    font-size: 14px;
+    line-height: 17px;
+    font-weight: 600;
+    color: #fff;
+    @media screen and (min-width: $screen-s) {
+      font-size: 12px;
+      line-height: 17px;
+    }
+
+  }
+
+  &__action {
+    width: 24px;
+    height: 24px;
+    background-image: url(/static/images/icons/close_white.svg);
+    cursor: pointer;
+    @media screen and (min-width: $screen-s) {
+      margin-left: 10px;
+      padding-right: 10px;
+      background-repeat: no-repeat;
+    }
+  }
+}

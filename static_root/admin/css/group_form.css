@@ -1,0 +1,29 @@
+.permissions-list {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.permissions-list__item {
+    flex-basis: calc(50% - 20px);
+    margin-right: 10px;
+    margin-bottom: 10px;
+}
+
+.permissions-list__item-title > input {
+    display: inline-block;
+    margin-right: 10px;
+}
+
+.permissions-list__item-title-text {
+    color: #226ab2;
+    cursor: pointer;
+}
+
+.permissions-list__item-content {
+    display: none;
+}
+
+.permissions-list__item_active .permissions-list__item-content {
+    display: block;
+}

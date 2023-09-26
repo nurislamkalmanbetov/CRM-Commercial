@@ -1,0 +1,96 @@
+.register-page {
+  margin: 50px 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr 8fr; 
+
+  @media screen and (min-width: $screen-s) {
+    flex-shrink: 0;
+    flex-grow: 1;
+    flex-basis: 30%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: stretch;
+    padding: 0 89px 0 60px;
+  }
+
+  &__title {
+    font-size: 22px;
+    line-height: 27px;
+    font-weight: 600;
+    @media screen and (min-width: $screen-s) {
+      margin-bottom: 16px;
+      font-size: 22px;
+      line-height: 30px;
+    }
+  }
+  &__subtitle {
+    display: block;
+    margin-top: 7px;
+    font-size: 16px;
+    line-height: 19px;
+    @media screen and (min-width: $screen-s) {
+      font-size: 18px;
+      line-height: 25px;
+      margin-bottom: 35px;
+    }
+  }
+
+  &__form {
+    // margin-top: 22px;
+    &-content {
+      display: grid;
+      grid-row-gap: 20px;
+    }
+    &-controls {
+      margin-top: 29px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      &-reset {
+        font-size: 13px;
+        color: #7c7c7c;
+      }
+    }
+
+    &-buttons {
+      margin-top: 29px;
+      width: 100%;
+      &-button {
+        width: 100%;
+        font-weight: 600;
+      }
+    }
+  }
+
+  &__terms {
+    display: flex;
+    align-items: flex-end;
+    // margin-top: 68px;
+    font-size: 10px;
+    line-height: 13px;
+    padding: 0 34px;
+    text-align: center; 
+  }
+
+  &__wrapper {
+    @media screen and (min-width: $screen-s) {
+      display: flex;
+      background-color: #fff;
+    }
+  }
+
+  &__desktop-image {
+    display: none;
+    @media screen and (min-width: $screen-s) {
+      display: block;
+      width: 100%;
+      flex-shrink: 1;
+      flex-grow: 1;
+      flex-basis: 70%;
+      background-image: url("https://iwex-crm-bucket.s3.amazonaws.com/static/images/main-bg-3.png");
+      background-size: cover;
+    }
+  }
+}

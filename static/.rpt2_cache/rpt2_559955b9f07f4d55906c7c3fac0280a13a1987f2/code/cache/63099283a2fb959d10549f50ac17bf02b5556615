@@ -1,0 +1,1 @@
+{"code":"import createSelectBand from './createSelectBands';\r\nexport default createSelectBand;\r\n","references":["/Users/roman/work/iwex-crm/iwex_crm/static/src/components/forms/selectBand/createSelectBands.ts"]}

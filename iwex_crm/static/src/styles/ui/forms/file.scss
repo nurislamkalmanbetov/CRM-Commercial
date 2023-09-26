@@ -1,0 +1,41 @@
+.file-input-wrapper {
+  display: block;
+  &__label {
+    display: block;
+    box-sizing: border-box;
+    width: 100%;
+    padding: 13px 0;
+    text-align: center;
+    border: 1px solid #d5d5d5;
+    border-radius: 4px;
+    font-size: 14px;
+    line-height: 19px;
+    color: #000;
+
+    transition: border-color .15s ease;
+
+    &_validated {
+      border-color: var(--green-color);
+    }
+
+    &_error {
+      border-color: var(--red-color);
+    }
+  }
+
+  &__input {
+    display: none;
+  }
+
+  &__error {
+    font-size: 10px;
+    height: 14px;
+    margin-top: 5px;
+    opacity: 0;
+    color: var(--red-color);
+    transition: opacity .3s ease;
+    &_show {
+      opacity: 1;
+    }
+  }
+}

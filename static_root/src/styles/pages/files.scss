@@ -1,0 +1,82 @@
+.files-page {
+  @media screen and (min-width: $screen-s) {
+    position: relative;
+    margin: 48px 60px 63px;
+    background-color: #fff;
+    box-shadow: var(--default-box-shadow);
+    padding: 40px 30px;
+    min-height: calc(100vh - 111px - 75px);
+    box-sizing: border-box;
+  }
+  &__title {
+    padding-left: 32px;
+    font-weight: 600;
+    font-size: 18px;
+    line-height: 25px;
+    background-repeat: no-repeat;
+    background-size: 24px 24px;
+    background-position: 0 center;
+    background-image: url("https://iwex-crm-bucket.s3.amazonaws.com/static/images/icons/documents.svg");
+    margin-bottom: 12px;
+    @media screen and (min-width: $screen-s) {
+      margin: 25px 0;
+    }
+
+  }
+
+  &__list {
+    display: grid;
+    grid-row-gap: 14px;
+    margin-top: 25px;
+    @media screen and (min-width: $screen-s) {
+      margin: 0;
+      grid-template-columns: 1fr 1fr 1fr;
+      grid-column-gap: 34px;
+    }
+  }
+
+  &__item {
+    border: 1px solid var(--yellow-color);
+    border-radius: 4px;
+    box-sizing: border-box;
+    padding: 22px 14px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    &-buttons {
+      display: grid;
+      grid-gap: 10px;
+      grid-template-columns: 1fr;
+      justify-content: center;
+      padding: 18px 0 0;
+      @media screen and (min-width: $screen-s) {
+        margin-top: 0;
+      }
+    }
+    
+    @media screen and (min-width: $screen-s) {
+
+    }
+
+    &-title {
+      @media screen and (min-width: $screen-s) {
+        font-size: 14px;
+        line-height: 19px;
+        font-weight: 600;
+      }
+      
+    }
+    &_success {
+      border-color: #27AE60;
+    }
+  }
+
+  &__submit-btn {
+    box-sizing: border-box;
+    display: block;
+    font-weight: bold;
+    width: 260px;
+    font-size: 14px;
+  }
+}

@@ -1,0 +1,377 @@
+.basic-questionnaire-page {
+  @media screen and (min-width: $screen-s) {
+    margin: 48px 60px 63px;
+    background-color: #fff;
+    box-shadow: var(--default-box-shadow);
+    padding: 40px 30px;
+  }
+
+  &__menu {
+    display: none;
+    @media screen and (min-width: $screen-s) {
+      flex-basis: 30%;
+      flex-grow: 0;
+      flex-shrink: 0;
+      display: grid;
+      grid-row-gap: 20px;
+      position: sticky;
+      top: 100px;
+      &-item {
+        font-size: 14px;
+        font-weight: 600;
+        color: #7c7c7c;
+        transition: color .3s ease;
+        &:hover {
+          color: #000;
+          cursor: pointer;
+        }
+
+        background-repeat: no-repeat;
+        background-position: right center;
+        background-size: 24px 24px;
+        margin-right: 35px;
+        &_success {
+          background-image: url("https://iwex-crm-bucket.s3.amazonaws.com/static/images/icons/check.svg");
+          color: var(--green-color);
+          background-size: 16px;
+          &:hover {
+            color: var(--green-color);
+          }
+        }
+
+        &_error {
+          background-image: url("https://iwex-crm-bucket.s3.amazonaws.com/static/images/icons/uncheck.svg");
+          color: var(--red-color);
+          background-size: 14px;
+          &:hover {
+            color: var(--red-color);
+          }
+        }
+      }
+    }
+  }
+
+  &__content {
+    @media screen and (min-width: $screen-s) {
+      display: flex;
+      align-items: flex-start;
+    }
+  }
+  
+  &__title {
+    padding-left: 32px;
+    font-weight: 600;
+    font-size: 18px;
+    line-height: 25px;
+    background-repeat: no-repeat;
+    background-size: 24px 24px;
+    background-position: 0 center;
+    background-image: url("https://iwex-crm-bucket.s3.amazonaws.com/static/images/icons/documents.svg");
+    margin-bottom: 12px;
+    @media screen and (min-width: $screen-s) {
+      border-bottom: 1px solid #5B5B5B;
+      padding-bottom: 18px;
+      line-height: 30px;
+      font-size: 20px;
+      background: none;
+      padding-left: 0;
+      margin: 20px 0 60px;
+    }
+  }
+
+  &__form {
+    display: grid;
+    grid-row-gap: 84px;
+    margin-top: 40px;
+    @media screen and (min-width: $screen-s) {
+      position: relative;
+      flex-basis: 680px;
+      margin-top: 0;
+      flex-shrink: 0;
+      grid-row-gap: 50px;
+    }
+
+  }
+
+  &__item {
+    &-title {
+      font-size: 10px;
+      font-weight: 600;
+      line-height: 14px;
+      margin-bottom: 18px;
+      @media screen and (min-width: $screen-s) {
+        font-size: 12px;
+        line-height: 18px;
+      }
+      
+      span {
+        font-weight: 400;
+        padding-left: 5px;
+      }
+    }
+
+    &-content {
+      display: grid;
+      grid-row-gap: 19px;
+      @media screen and (min-width: $screen-s) {
+        grid-template-columns: 1fr 1fr;
+        grid-column-gap: 24px;
+        grid-row-gap: 35px;
+      }
+
+    }
+  }
+
+  &__button {
+    width: 100%;
+    box-sizing: border-box;
+    display: block;
+    margin: -40px 0 40px;
+    @media screen and (min-width: $screen-s) {
+      width: calc(50% - 12px);
+      margin: 0;
+    }
+
+  }
+
+  &__view {
+    position: relative;
+    margin-top: 40px;
+    display: grid;
+    grid-row-gap: 16px;
+    @media screen and (min-width: $screen-s) {
+      grid-template-columns: 1fr 1fr 1fr;
+      grid-row-gap: 40px;
+      padding-left: 195px;
+      margin-top: 0;
+    }
+
+    &-text {
+      margin-top: 20px;
+      padding: 16px 8px;
+      border-radius: 4px;
+      background-color: var(--green-color);
+      color: #fff;
+      box-shadow: var(--default-box-shadow);
+      font-size: 14px;
+      line-height: 16px;
+      text-align: center;
+      a {
+        color: #2f80ed;
+        &:hover {
+          text-decoration: underline;
+          color: #fff;
+        }
+      }
+    }
+
+    &-item {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      &-title {
+        font-size: 10px;
+        font-weight: 600;
+        line-height: 14px;
+        margin-bottom: 7px;
+        @media screen and (min-width: $screen-s) {
+          font-size: 12px;
+          line-height: 17px;
+          color: #7c7c7c;
+        }
+      }
+      span {
+        font-size: 14px;
+        line-height: 30px;
+
+        b {
+          font-size: 12px;
+          line-height: 17px;
+          color: var(--deep-gray-color);
+          @media screen and (min-width: $screen-s) {
+            font-size: 10px;
+            line-height: 13px;
+          }
+        }
+
+        @media screen and (min-width: $screen-s) {
+          font-size: 12px;
+          line-height: 17px;
+        }
+      }
+    }
+
+    &-buttons {
+      margin-top: 35px;
+      margin-bottom: 20px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-column-gap: 10px;
+      justify-content: space-between;
+      align-items: center;
+      @media screen and (min-width: $screen-s) {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        margin-top: 50px;
+      }
+
+      .button {
+        @media screen and (min-width: $screen-s) {
+          width: 25%;
+          margin-left: 20px;
+        }
+
+      }
+    }
+  }
+  
+  &__photo {
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 137.6px;
+    display: block;
+    @media screen and (min-width: $screen-s) {
+      right: auto;
+      left: 0;
+    }
+  }
+
+  &__photo-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    &-title {
+      display: block;
+      margin-bottom: 20px;
+      align-self: flex-start;
+    }
+
+    &-helper {
+      font-size: 12px;
+      display: block;
+      width: 206.5px;
+      text-align: center;
+      display: none;
+      &_show {
+        display: block;
+      }
+    }
+
+    &-input {
+      display: none;
+    }
+
+    &-label {
+      display: block;
+      box-sizing: border-box;
+      width: 100%;
+      padding: 13px 0;
+      text-align: center;
+      border: 1px solid #d5d5d5;
+      border-radius: 4px;
+      font-size: 14px;
+      line-height: 19px;
+      color: #000;
+
+      transition: border-color .15s ease;
+
+      &_validated {
+        border-color: var(--green-color);
+      }
+
+      &_error {
+        border-color: var(--red-color);
+      }
+    }
+
+    &-photo {
+      display: block;
+      width: 206.5px;
+      height: 265.5px;      
+      margin: 0 auto;
+      margin-bottom: 20px;
+      background-image: url("https://iwex-crm-bucket.s3.amazonaws.com/static/images/user.png");
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      border: 1px solid var(--light-gray-color);
+      @media screen and (min-width: $screen-s) {
+        border-radius: 4px;
+        margin: 0;
+        margin-bottom: 16px;
+      }
+
+      &_success {
+        position: relative;
+        cursor: pointer;
+        &:before {
+          content: 'Нажмите, чтобы повернуть фотографию';
+          background-image: url("https://iwex-crm-bucket.s3.amazonaws.com/static/images/icons/rotate.svg");
+          background-size: 40px;
+          background-repeat: no-repeat;
+          background-position: center;
+          font-size: 12px;
+          text-align: center;
+          display: flex;
+          align-items: center;
+          padding-top: 170px;      
+          color: #fff;
+          position: absolute;
+          left: 0;
+          right: 0;
+          top: 0;
+          bottom: 0;
+          background: rgba(0,0,0,.5);
+          opacity: 0;
+          transition: all .3s ease;
+          display: none;
+          @media screen and (min-width: $screen-s) {
+            display: block;
+          }
+        }
+        &:hover {
+          &:before {
+            opacity: 1;
+          }
+        }
+      }
+    }
+    label {
+      width: 206.5px;
+      cursor: pointer;
+    }
+  }
+
+  &__work {
+    &-subtitle {
+      font-size: 11px;
+      line-height: 16px;
+      font-weight: 600;
+      @media screen and (min-width: $screen-s) {
+        grid-column: 1/3;
+      }
+    }
+  }
+
+  &__language {
+    &-text {
+      display: flex;
+      align-items: center;
+      font-size: 12px;
+      line-height: 18px;
+      padding-bottom: 19px;
+    }
+  }
+
+  &__hobbie {
+    grid-column: 1/3;
+    grid-template-columns: 1fr 1fr;
+    grid-row-gap: 15px;
+    @media screen and (min-width: $screen-s) {
+      grid-template-columns: 1fr 1fr 1fr;
+    }
+
+  }
+}

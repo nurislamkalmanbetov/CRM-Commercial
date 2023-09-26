@@ -1,0 +1,1 @@
+{"code":"import createCheckboxes from './createCheckbox';\r\nexport default createCheckboxes;\r\n","references":["/Users/roman/work/iwex-crm/iwex_crm/static/src/components/forms/checkbox/createCheckbox.ts"]}

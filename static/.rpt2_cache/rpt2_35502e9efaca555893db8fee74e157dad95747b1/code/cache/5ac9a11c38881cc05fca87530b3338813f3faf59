@@ -1,0 +1,1 @@
+{"code":"import Form from './Form';\r\nexport default (function (formId, validations) {\r\n    var form = document.querySelector(formId);\r\n    if (!form)\r\n        return;\r\n    new Form(form, validations);\r\n});\r\n","references":["/Users/roman/work/iwex-crm/iwex_crm/static/src/components/forms/form/Form.ts"]}

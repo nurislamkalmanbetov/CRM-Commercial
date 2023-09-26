@@ -1,0 +1,45 @@
+.notifications-page {
+  @media screen and (min-width: $screen-s) {
+    margin: 48px 60px 63px;
+    background-color: #fff;
+    box-shadow: var(--default-box-shadow);
+    padding: 40px 30px;
+    min-height: calc(100vh - 111px - 75px);
+    box-sizing: border-box;
+  }
+  &__title {
+    padding-left: 32px;
+    font-weight: 600;
+    font-size: 18px;
+    line-height: 25px;
+    background-repeat: no-repeat;
+    background-size: 24px 24px;
+    background-position: 0 center;
+    background-image: url("https://iwex-crm-bucket.s3.amazonaws.com/static/images/icons/notifications.svg");
+    margin-bottom: 12px;
+    @media screen and (min-width: $screen-s) {
+      font-weight: 600;
+      font-size: 18px;
+      line-height: 30px;
+      margin-bottom: 30px;
+      margin-top: 30px;
+    }
+  }
+
+  &__list {
+    display: grid;
+    grid-row-gap: 16px;
+    @media screen and (min-width: $screen-s) {
+      grid-row-gap: 22px;
+    }
+  }
+
+  &__message {
+    font-size: 12px;
+    line-height: 19px;
+    @media screen and (min-width: $screen-s) {
+      font-size: 14px;
+      line-height: 19px;
+    }
+  }
+}

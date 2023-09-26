@@ -1,0 +1,1 @@
+{"code":"import ReturnBtn from './ReturnBtn';\r\nexport default (function () {\r\n    var RETURN_BTN_QUERY = '.return-btn';\r\n    var btns = document.querySelectorAll(RETURN_BTN_QUERY);\r\n    btns.forEach(function (btn) { return new ReturnBtn(btn); });\r\n});\r\n","references":["/Users/roman/work/iwex-crm/iwex_crm/static/src/components/shared/return-btn/ReturnBtn.ts"]}

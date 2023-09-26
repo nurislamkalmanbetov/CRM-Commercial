@@ -1,0 +1,8 @@
+./css/
+./js/
+./fonts/
+./img/
+node_modules/
+*.log
+.sass-cache
+./.rpt2_cache/

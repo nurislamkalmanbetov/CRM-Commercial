@@ -1,0 +1,1 @@
+{"code":"import Input from './Input';\r\nexport default (function () {\r\n    var INPUT_QUERY = '.input-wrapper';\r\n    var inputs = document.querySelectorAll(INPUT_QUERY);\r\n    inputs.forEach(function (input) { return new Input(input); });\r\n});\r\n","references":["/home/romanch/work/iwex-crm/iwex_crm/static/src/components/forms/input/Input.ts"]}

@@ -1,0 +1,25 @@
+// TODO: Need to change google font to local
+
+@import url('https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700,800&display=swap');
+
+@import 'reset.scss';
+
+.no-scroll {
+  overflow-y: hidden;
+}
+
+*{
+  font-family: 'Open Sans', sans-serif !important;
+  color: var(--default-text-color);
+  --webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+
+@import 'ui/index.scss';
+@import 'components/index.scss';
+@import 'pages/index.scss';
+
+body {
+  @media screen and (min-width: $screen-s) {
+    background-color: #eee;
+  }
+}

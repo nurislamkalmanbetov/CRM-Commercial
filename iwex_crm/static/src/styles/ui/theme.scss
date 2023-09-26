@@ -1,0 +1,70 @@
+$screen-l: 1024px;
+$screen-s: 1024px;
+
+.theme {
+  &_color {
+    &_default {
+      --default-bg: #fff;
+      --sub-bg: #F5F5F5;
+      --default-text-color: #000000;
+      --input-border-color: #6F6F6F;
+      --input-text-color: #6F6F6F;
+      --sky-color: #39C7FE;
+      --green-color: #27AE60;
+      --yellow-color: #FECF1D;
+      --red-color: #EB2029;
+      --gold-color: #DCAB00;
+      --dark-color: #1C1C1C;
+      --light-gray-color: #F3F3F3;
+      --deep-gray-color: #8C8C8C;
+
+      --primary-color: var(--yellow-color);
+      --secondary-color: var(--dark-color);
+      --danger-color: var(--red-color);
+
+      --default-box-shadow: 0px 4px 4px rgba(0,0,0,.25);
+    }
+  }
+
+  &_size {
+    &_default {
+      --font-size-xs: 9px;
+      --line-height-xs: 12px;
+      --font-size-s: 11px;
+      --line-height-s: 14px;
+      --font-size-m: 13px;
+      --line-height-m: 18px;
+      --font-size-l: 15px;
+      --line-height-l: 20px;
+      --font-size-xl: 18px;
+      --line-height-xl: 24px;
+      --font-size-xxl: 22px;
+      --line-height-xxl: 30px;
+    }
+  }
+
+  &_space {
+    &_default {
+      --space-xxxs: 2px;
+      --space-xxs: 4px;
+      --space-xs: 8px;
+      --space-s: 12px;
+      --space-m: 16px;
+      --space-l: 20px;
+      --space-xl: 24px;
+      --space-xxl: 32px;
+      --space-xxxl: 40px;
+      --space-xxxxl: 48px;
+    }
+  }
+
+  &_gap {
+    &_small {
+      --gap-m: 4px;
+      --gap-l: 8px;
+      --gap-xl: 12px;
+      --gap-xxl: 16px;
+      --gap-xxxl: 20px;
+    }
+  }
+}

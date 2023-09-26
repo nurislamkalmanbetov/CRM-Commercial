@@ -1,0 +1,79 @@
+.card {
+  &_active {
+    --card-text-color: #fff;
+    --card-bg-color: var(--gold-color);
+    --card-bg-image: url(/static/images/icons/lock-open.svg);
+    --action-color: #000;
+  }
+
+  &_disabled {
+    --card-text-color: #7C7C7C;
+    --card-bg-color: #F5F5F5;
+    --card-bg-image: url(/static/images/icons/lock-close.svg);  
+    --action-color:#7C7C7C;
+    pointer-events: none;
+  }
+
+  &_success {
+    --card-text-color: #fff;
+    --card-bg-color: var(--gold-color);
+    --card-bg-image: url(/static/images/icons/lock-open.svg);
+    --action-color: #000;
+    .card__action {
+      display: none;
+    }
+    background-image: url(/static/images/icons/questionnaire-success.svg);
+    background-size: 50px;
+    background-repeat: no-repeat;
+    background-position: calc(100% - 12px) center;
+  }
+  margin: 14px 0;
+  background-color: var(--card-bg-color);
+  height: 119px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 18px;
+  box-sizing: border-box;
+  box-shadow: var(--default-box-shadow);
+  &__info {
+    padding-left: 28px;
+    background-image: var(--card-bg-image);
+    background-size: 24px 24px;
+    background-repeat: no-repeat;
+    background-position: 0 center;
+  }
+  &__title {
+    font-size: 16px;
+    line-height: 22px;
+    font-weight: 600;
+    color: var(--card-text-color);
+  }
+
+  &__more-info {
+    font-size: 12px;
+    line-height: 16px;
+    font-weight: 300;
+    color: var(--card-text-color);
+  }
+
+  &__action {
+    &-btn {
+      background: #F4F4F4;
+      box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.55);
+      border-radius: 23.5px;
+      color: var(--action-color);
+      font-size: 10px;
+      line-height: 24px;
+      font-weight: 600;
+      padding: 2px 16px;
+      display: block;
+      box-sizing: border-box;
+    }
+  }
+
+  @media screen and (min-width: $screen-s) {
+    margin: 0;
+  }
+}

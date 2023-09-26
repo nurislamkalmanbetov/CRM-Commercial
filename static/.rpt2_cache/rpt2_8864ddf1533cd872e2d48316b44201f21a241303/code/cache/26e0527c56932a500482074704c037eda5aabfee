@@ -1,0 +1,1 @@
+{"code":"import createDownloader from './createDownloader';\r\nexport default createDownloader;\r\n","references":["/Users/roman/work/iwex-crm/iwex_crm/static/src/components/shared/downloader/createDownloader.ts"]}

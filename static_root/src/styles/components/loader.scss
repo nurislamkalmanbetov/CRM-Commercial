@@ -1,0 +1,68 @@
+.loader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0,0,0,.35);
+  z-index: 20;
+  opacity: 0;
+  visibility: hidden;
+  transition: all .3s ease;
+  &_show {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  &__content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  &__logo {
+    width: 115px;
+    height: 57px;
+    background-image: url(/static/images/logos/iwex-core.svg);
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+  }
+
+  &__text {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #fff;
+  }
+
+  &__spinner {
+    margin-top: 15px;
+    width: 115px;
+    height: 6px;
+    border-radius: 4px;
+    background-color: #ccc;
+    position: relative;
+    &:before {
+      position: absolute;
+      content: '';
+      background-color: var(--gold-color);
+      border-radius: 4px;
+      width: 0px;
+      height: 6px;
+      animation: spin 3s ease-in infinite;
+    }
+  }
+}
+
+@keyframes spin {
+  from{
+    width: 0px;
+  }
+  to{
+    width: 115px;
+  }
+}
