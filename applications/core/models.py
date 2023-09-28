@@ -87,7 +87,7 @@ class EmployerCompany(models.Model):
     user = models.ForeignKey('accounts.User', on_delete=models.CASCADE, verbose_name='Работодатель')
     name = models.CharField(verbose_name='Название', max_length=255)
     country = models.CharField('страна', max_length=128, blank=True, default='')
-
+    description = models.TextField('Описание', blank=True, default='')
 
 
     def __str__(self):
@@ -122,14 +122,14 @@ class Vacancy(models.Model):
         ('KGS','KGS'),
         ('KZT','KZT'),
     )
-
-    language = models.CharField('Язык', choices=LANGUAGE_CHOICES, max_length=2, blank=True, default='')
-    proficiency = models.CharField('Уровень владения', choices=PROFICIENCY_LEVELS, max_length=2, blank=True, default='')
-
     ACCOMODATION_TYPE_CHOICES = (
         ('yes', 'Предоставляется'),
         ('no', 'Не предоставляется'),
     )
+    language = models.CharField('Язык', choices=LANGUAGE_CHOICES, max_length=2, blank=True, default='')
+    proficiency = models.CharField('Уровень владения', choices=PROFICIENCY_LEVELS, max_length=2, blank=True, default='')
+
+
     picture = models.ImageField(upload_to='vacancy_pics/', blank=True)
     user = models.ForeignKey('accounts.User', on_delete=models.CASCADE, verbose_name='Работодатель')
     employer_company = models.ForeignKey(EmployerCompany, verbose_name='Компания работодателя',
@@ -209,6 +209,46 @@ class Tariff(models.Model):
     class Meta:
         verbose_name = 'Тариф'
         verbose_name_plural = 'Тарифы'
+
+
+
+
+class Feedback(models.Model):
+    STATUS_CHOICES = (
+        ('MODERETED', 'Прошел модерацию'),
+        ('IN_PROCESS', 'В обработке'),
+        ('DECLINED', 'Отклонен'),
+    )
+    text = models.TextField(verbose_name='Текст отзыва')
+    user = models.ForeignKey('accounts.User', on_delete=models.CASCADE, verbose_name='Пользователь')
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания')
+    status = models.CharField(max_length=12, choices=STATUS_CHOICES, default='IN_PROCESS', verbose_name='Статус')
+
+    def __str__(self):
+        return self.text[:50]
+
+    class Meta:
+        verbose_name = 'Отзыв'
+        verbose_name_plural = 'Отзывы'
+
+class ImprovementIdea(models.Model):
+    STATUS_CHOICES = (
+        ('NEW', 'Новый'),
+        ('IN_PROCESS', 'В обработке'),
+        ('IMPLEMENTED', 'Реализован'),
+        ('DECLINED', 'Отклонен'),
+    )
+    text = models.TextField(verbose_name='Текст идеи')
+    user = models.ForeignKey('accounts.User', on_delete=models.CASCADE, verbose_name='Пользователь')
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания')
+    status = models.CharField(max_length=12, choices=STATUS_CHOICES, default='NEW', verbose_name='Статус')
+
+    def __str__(self):
+        return self.text[:50]
+
+    class Meta:
+        verbose_name = 'Идея улучшения'
+        verbose_name_plural = 'Идеи улучшения'
 
 
 

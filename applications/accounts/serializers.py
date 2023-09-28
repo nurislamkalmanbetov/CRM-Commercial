@@ -85,10 +85,6 @@ class ProfileListSerializer(serializers.ModelSerializer):
 class UserListSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'avatar', 'email', 'phone', 'whatsapp_phone', 'is_employer', 'is_active')
+        fields = ('id', 'email', 'phone', 'whatsapp_phone', 'is_employer', 'is_active')
 
 
-class UserListPutchSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ('id', 'avatar')

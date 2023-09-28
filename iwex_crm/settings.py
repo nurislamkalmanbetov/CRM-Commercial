@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'modeltranslation',
     'easy_thumbnails',
     'storages',
     'applications.accounts',
@@ -66,7 +67,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'rest_framework_simplejwt',
     'corsheaders',
-   
+    'imagekit',
 
 ]
 REST_FRAMEWORK = {
@@ -124,7 +125,7 @@ WSGI_APPLICATION = 'iwex_crm.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'iwexs',
+        'NAME': 'iwexs1',
         'USER': 'postgres',
         'PASSWORD': '123',
         'HOST': 'localhost',
@@ -182,6 +183,10 @@ LANGUAGES = (
     ('en', 'English'),
     ('ky', 'Kyrgyz'),
 )
+MODELTRANSLATION_DEFAULT_LANGUAGE = 'en'  # Язык по умолчанию
+MODELTRANSLATION_LANGUAGES = ('en', 'de')  # Список поддерживаемых языков
+
+MODELTRANSLATION_PREPOPULATE_LANGUAGE = 'en' 
 
 LOCALE_PATHS = (
    os.path.join(BASE_DIR, 'locale'),

@@ -11,11 +11,12 @@ class EmployerCompanySerialzers(serializers.ModelSerializer):
             'id',
             'user',
             'name',
-            'country'
+            'country',
+            'description',
         ]
 
     def create(self, validated_data):
-        user_email = validated_data.pop('user').get('email')
+        user_email = validated_data.pop('user')
         user = User.objects.get(email=user_email)
         employercompany = EmployerCompany.objects.create(user=user, **validated_data)  # Используем **validated_data
         return employercompany
@@ -93,3 +94,12 @@ class ReviewVacancySerializer(serializers.ModelSerializer):
         return ReviewVacancy.objects.create(**validated_data)
 
 
+class FeedbackSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Feedback
+        fields = ('id', 'text', 'user', 'created_at', 'status')
+
+class ImprovementIdeaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ImprovementIdea
+        fields = ('id', 'text', 'user', 'created_at', 'status')

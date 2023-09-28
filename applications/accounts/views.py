@@ -92,7 +92,3 @@ class UserView(ListAPIView):
     filterset_fields = ['email']
 
     
-class UserListView(viewsets.ModelViewSet):
-    queryset = User.objects.all()
-    serializer_class = UserListPutchSerializer
-    parser_classes = (MultiPartParser, FormParser)

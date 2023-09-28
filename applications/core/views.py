@@ -15,6 +15,28 @@ from rest_framework.views import APIView
 from .models import Vacancy
 from .serializers import *
 
+class EmployerCompanyView(generics.CreateAPIView):
+    serializer_class = EmployerCompanySerialzers
+    queryset = EmployerCompany.objects.all()
+
+    def perform_create(self, serializer):
+        user_data = self.request.data.get('user')
+        try:
+            user = User.objects.get(email=user_data)
+        except User.DoesNotExist:
+            raise serializers.ValidationError({'detail': 'User not found.'})
+
+        if not user.is_employer:
+            raise serializers.ValidationError({'detail': 'You are not an employer.'})
+
+        if user.is_employer and not user.is_active:
+            raise serializers.ValidationError({'detail': 'Your account is not active.'})
+        
+        serializer.save(user=user)
+
+
+    def post(self, request, *args, **kwargs):
+        return self.create(request, *args, **kwargs)
 
 class VacancyPagination(PageNumberPagination):
     page_size = 15
@@ -201,3 +223,11 @@ class NewVacancyView(ListAPIView):
             is_vacancy_confirmed=True,
             created_date__range=(three_days_ago, current_date)
         )
+
+
+
+class ModeratedFeedbackListView(generics.ListAPIView):
+    serializer_class = FeedbackSerializer
+
+    def get_queryset(self):
+        return Feedback.objects.filter(status='moderated')

@@ -28,7 +28,6 @@ from smart_selects.db_fields import ChainedForeignKey
 
 
 class User(AbstractBaseUser, PermissionsMixin):
-    avatar = models.ImageField(upload_to='user_avatar/', null=True, blank=True)
     email = models.EmailField('Email адрес', unique=True, db_index=True)
     phone = models.CharField('Номер телефона', max_length=50, blank=True, db_index=True)
     whatsapp_phone = models.CharField('Номер Whatsapp', max_length=50, blank=True, db_index=True)
@@ -51,7 +50,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     def save(self, *args, **kwargs):
         if not self.email:
             raise ValueError('User must have an email')
-
+        if self.pk is None:  # если это новый объект
+            self.set_password(self.password)
         # self.full_clean()
         # self.email = self.email.lower()
         super(User, self).save(*args, **kwargs)

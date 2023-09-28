@@ -57,3 +57,25 @@ class TariffAdmin(admin.ModelAdmin):
     fields = (('amount_in_digits', 'amount_in_text'), )
 
     list_display = ['amount_in_digits', ]
+
+
+@admin.register(Feedback)
+class FeedbackAdmin(admin.ModelAdmin):
+    list_display = ('text', 'user', 'created_at', 'status')
+    list_filter = ('status',)
+    search_fields = ('text', )
+    list_editable = ('status',)
+    actions = ['mark_as_DECLINED', 'mark_as_modereted']
+
+    def mark_as_DECLINED(self, request, queryset):
+        queryset.update(status='DECLINED')
+    mark_as_DECLINED.short_description = 'Пометить как в Отклонен'
+    def mark_as_modereted(self, request, queryset):
+        queryset.update(status='MODERETED')
+    mark_as_modereted.short_description = 'Пометить как в прошли модерацию'
+
+@admin.register(ImprovementIdea)
+class ImprovementIdeaAdmin(admin.ModelAdmin):
+    list_display = ('text', 'user', 'created_at', 'status')
+    list_filter = ('status',)
+    search_fields = ('text',)

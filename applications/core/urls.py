@@ -3,6 +3,7 @@ from .views import *
 
 
 urlpatterns = [
+    path('employer-company-create/', EmployerCompanyView.as_view(), name='employer-company'),
     #Vacancy
     path('vacancy/', VacancyListView.as_view(), name='vacancy'),
     path('vacancy-change-detail/<int:pk>/', VacancyChangeView.as_view(), name='vacancy-change-detail'),
@@ -16,7 +17,7 @@ urlpatterns = [
     path('review-get', ReviewVacancyListView.as_view(), name='review-get'),
     path('review-patch/<int:pk>/', ReviewVacancyUpdateView.as_view(), name='review-patch'),
 
-
+    path('feedback-get', ModeratedFeedbackListView.as_view(), name='feedback-get'),
 
     # path('university/', UniversityView.as_view(), name='university'),
     # path('faculty/', FacultyView.as_view(), name='faculty'),

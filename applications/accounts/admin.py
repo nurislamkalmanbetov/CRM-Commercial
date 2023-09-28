@@ -41,12 +41,12 @@ User = get_user_model()
 class UserAdmin(admin.ModelAdmin):
     # fields = ['email', 'phone', 'whatsapp_phone', 'password','is_staff','is_employer', 'is_student', 'is_delete', 'is_active', 'is_superuser', ]
     fieldsets = (
-        (None, {'fields': ('email', 'avatar','phone', 'whatsapp_phone', 'password','is_staff','is_employer', 'is_student', 'is_delete', 'is_active', 'is_superuser',)}),
+        (None, {'fields': ('email', 'phone', 'whatsapp_phone', 'password','is_staff','is_employer', 'is_student', 'is_delete', 'is_active', 'is_superuser',)}),
             )
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('email', 'phone','avatar', 'whatsapp_phone', 'password1','password2','is_staff','is_employer', 'is_student', 'is_delete', 'is_active', 'is_superuser', ),
+            'fields': ('email', 'phone','whatsapp_phone', 'password1','password2','is_staff','is_employer', 'is_student', 'is_delete', 'is_active', 'is_superuser', ),
         }),
     )
     list_display = ['id','email', 'phone', 'whatsapp_phone', 'is_staff', 'is_delete', 'is_active','is_employer', 'is_student', 'is_superuser', ]
@@ -209,9 +209,38 @@ class ProfileAdmin(admin.ModelAdmin):
         }),
     )
 
+class ProfileInContactDetailsAdmin(admin.ModelAdmin):
+    list_display = ['id', 'get_user_email', 'get_user_phone', 'get_user_whatsapp_phone', 'get_father_phone', 'get_mother_phone']
+
+    def get_user_email(self, obj):
+        return obj.user.email
+    
+    get_user_email.short_description = "User Email"
+
+    def get_user_phone(self, obj):
+        return obj.user.phone 
+    
+    get_user_phone.short_description = "User Phone"
+    def get_user_whatsapp_phone(self, obj):
+        return obj.user.whatsapp_phone  # Подразумевается, что в модели User есть поле whatsapp_phone
+
+    get_user_whatsapp_phone.short_description = 'User WhatsApp Phone'
+
+    def get_father_phone(self, obj):
+        return obj.father_phone  # Подразумевается, что в модели Profile есть поле father_phone
+
+    get_father_phone.short_description = 'Father Phone'
+
+    def get_mother_phone(self, obj):
+        return obj.mother_phone  # Подразумевается, что в модели Profile есть поле mother_phone
+
+    get_mother_phone.short_description = 'Mother Phone'
+
+
+admin.site.register(ProfileInContactDetails,ProfileInContactDetailsAdmin)
 
 admin.site.register(ProfileInArchive)
-admin.site.register(ProfileInContactDetails)
+# admin.site.register(ProfileInContactDetails)
 admin.site.register(ProfileInEmbassy)
 admin.site.register(ProfileInInterview)
 admin.site.register(ProfileNotConfirmed)
