@@ -9,27 +9,13 @@ from applications.accounts.models import (Bill, Interview, Profile,
                                           ProfileInRegistration,
                                           ProfileInSending, ProfileInTermin,
                                           ProfileInVacancy,
-                                          ProfileNotConfirmed, Staff)
+                                          ProfileNotConfirmed, Staff, Payment, StudentDocumentsProfileProxy)
 from django.contrib import admin
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from django.db.models import ManyToManyField
 from django.utils.safestring import mark_safe
-
-# from applications.accounts.admin_utils.archive_admin import ProfileInArchiveAdmin
-# from applications.accounts.admin_utils.termin_admin import ProfileInTerminAdmin
-# from applications.accounts.admin_utils.contact_admin import ProfileInContactDetailsAdmin
-# from applications.accounts.admin_utils.embassy_admin import ProfileInEmbassyAdmin
-# from applications.accounts.admin_utils.interview_admin import ProfileInterviewAdmin
-# from applications.accounts.admin_utils.not_confirmed_admin import ProfileNotConfirmedAdmin
-# from applications.accounts.admin_utils.payment_admin import ProfileInPaymentAdmin
-# from applications.accounts.admin_utils.profile_admin import ProfileAdmin
-# from applications.accounts.admin_utils.registration_admin import ProfileRegistrationAdmin
-# from applications.accounts.admin_utils.sending_admin import ProfileInSendingAdmin
-# from applications.accounts.admin_utils.vacancy_admin import ProfileInVacancyAdmin
-# from applications.accounts.admin_utils.essential_info_admin import ProfileInEssentialInfoAdmin
-# from applications.accounts.admin_utils.refused_admin import ProfileInRefusedAdmin
-
+from .forms import PaymentAdminForm
 
 
 
@@ -137,47 +123,6 @@ class LogEntryAdmin(admin.ModelAdmin):
     ]
 
 
-#@admin.register(ProfileHistory)
-#class ProfileHistoryAdmin(admin.ModelAdmin):
-
-#    list_display = ['username', 'date', 'changes']
-#
-#    search_fields = ['username']
-
-
-#admin.site.register(Staff)
-
-# admin.site.register(ProfileInEssentialInfo, ProfileInEssentialInfoAdmin)
-
-# admin.site.register(ProfileInArchive, ProfileInArchiveAdmin)
-
-# admin.site.register(ProfileInContactDetails, ProfileInContactDetailsAdmin)
-
-# admin.site.register(ProfileInEmbassy, ProfileInEmbassyAdmin)
-
-# admin.site.register(ProfileInInterview, ProfileInterviewAdmin)
-
-# admin.site.register(ProfileNotConfirmed, ProfileNotConfirmedAdmin)
-
-# admin.site.register(ProfileInPayment, ProfileInPaymentAdmin)
-
-# admin.site.register(Profile, ProfileAdmin)
-
-# admin.site.register(ProfileInRegistration, ProfileRegistrationAdmin)
-
-# admin.site.register(ProfileInSending, ProfileInSendingAdmin)
-
-# admin.site.register(ProfileInVacancy, ProfileInVacancyAdmin)
-
-# admin.site.register(ProfileInTermin, ProfileInTerminAdmin)
-
-# admin.site.register(ProfileInRefused, ProfileInRefusedAdmin)
-
-# class ProfileInVacancyAdmin(admin.ModelAdmin):
-#     list_display = [
-#         'employer',
-#     ]
-#     autocomplete_fields = ['employer',]
 
 class ProfileAdmin(admin.ModelAdmin):
     list_display = ('id', 'user', 'photo', 'first_name', 'last_name', 'telephone',
@@ -236,6 +181,27 @@ class ProfileInContactDetailsAdmin(admin.ModelAdmin):
 
     get_mother_phone.short_description = 'Mother Phone'
 
+
+
+class PaymentAdmin(admin.ModelAdmin):
+    form = PaymentAdminForm
+    list_display = ['id', 'user', 'who_created', 'amount_paid', 'remaining_amount', 'is_fully_paid', 'payment_date', 'due_date']
+
+class StudentDocumentsAdmin(admin.ModelAdmin):
+    list_display = [ 'user',
+        'photo', 'study_certificate', 'study_certificate_embassy', 'study_certificate_translate_embassy',
+        'photo_for_schengen', 'zagranpassport_copy', 'passport_copy', 'fluorography_express',
+        'fluorography', 'immatrikulation', 'transcript', 'transcript_translate', 'bank_statement',
+        'conduct_certificate', 'mentaldispanser_certificate', 'drugdispanser_certificate', 'parental_permission',
+        'bank_details', 'agreement1', 'agreement2', 'agreement3', 'act1', 'act2', 'act3', 
+        'closure1', 'closure2', 'closure3', 'consult_list', 'invitation', 'labor_agreement', 
+        'liveplace_approve', 'insurance', 'visa_file'
+    ]
+    search_fields = ['user__email'] 
+
+admin.site.register(StudentDocumentsProfileProxy, StudentDocumentsAdmin)
+
+admin.site.register(Payment,PaymentAdmin)
 
 admin.site.register(ProfileInContactDetails,ProfileInContactDetailsAdmin)
 

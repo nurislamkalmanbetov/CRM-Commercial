@@ -1,6 +1,8 @@
 import datetime
 import json
 import uuid
+from datetime import date, timedelta
+from django.core.exceptions import ValidationError
 
 from applications.accounts.managers import (ProfileEssentialInfoManager,
                                             ProfileInArchiveManager,
@@ -73,6 +75,45 @@ class Staff(User):
         verbose_name_plural = 'сотрудники'
 
 
+def get_due_date():
+    return date.today() + timedelta(days=60)
+
+
+def is_staff_or_superuser(user_id):
+    user = User.objects.get(pk=user_id)
+    if not user.is_staff and not user.is_superuser:
+        raise ValidationError("Only staff or superuser can be assigned as 'Оплату принял'")
+
+
+class Payment(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='payments')
+    who_created = models.ForeignKey(User, on_delete=models.PROTECT, verbose_name='Оплату принял', related_name='payments_received', validators=[is_staff_or_superuser])
+    amount_paid = models.DecimalField('Оплачено', max_digits=10, decimal_places=2, default=0)
+    remaining_amount = models.DecimalField('Остаток', max_digits=10, decimal_places=2, editable=False, default=35000)
+    is_fully_paid = models.BooleanField('Оплачено полностью', default=False)
+    payment_date = models.DateField('Дата оплаты', auto_now_add=True)
+    due_date = models.DateField('Крайний срок оплаты', default=get_due_date, null=True)
+
+    def str(self):
+        return f"ID: {self.id} {self.user.email} Оплачено: {self.amount_paid} Остаток: {self.remaining_amount}"
+
+    def save(self, *args, **kwargs):
+        # Вычисляем остаток на основе оплаченной суммы
+        self.remaining_amount = 35000 - self.amount_paid
+        # Устанавливаем значение is_fully_paid в зависимости от остатка
+        self.is_fully_paid = self.remaining_amount <= 0
+        # Если запись создается (и не обновляется), устанавливаем due_date на 2 месяца позже от текущей даты
+        if not self.pk:  # Проверка, что объект еще не сохранен в базе данных
+            self.payment_date = date.today()
+            if self.is_fully_paid:
+                self.due_date = None
+            else:
+                self.due_date = self.payment_date + timedelta(days=60)  # Добавляем 60 дней (приближенно 2 месяца)
+        super(Payment, self).save(*args, **kwargs)
+
+    class Meta:
+        verbose_name = 'Платеж студента'
+        verbose_name_plural = 'Платежи студентов'
 
 class Profile(models.Model):
 
@@ -898,6 +939,12 @@ class Profile(models.Model):
 
     class Meta:
         ordering = ['last_name', 'first_name', '-creation_date']
+
+class StudentDocumentsProfileProxy(Profile):
+    class Meta:
+        proxy = True
+        verbose_name = "Документ Студента"
+        verbose_name_plural = "Документы Студентов"
 
 class Interview(models.Model):
     INVITED_STATUS_CHOICES = (

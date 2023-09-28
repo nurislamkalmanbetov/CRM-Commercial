@@ -4,7 +4,7 @@ from django.forms.widgets import ChoiceWidget
 from django.template import loader
 from django.utils.safestring import mark_safe
 
-from applications.accounts.models import Profile, Staff
+from applications.accounts.models import Profile, Staff, Payment
 from applications.accounts.utils import only_roman_chars
 from applications.core.models import University, Faculty, ContractAdmin, Tariff
 from applications.core.constants import (
@@ -13,9 +13,18 @@ from applications.core.constants import (
     AGREEMENT_ACT_TYPE_CHOICES,
     CLOSURE_DOC_TYPE_CHOICES,
 )
-
+from django.db.models import Q
 User = get_user_model()
 
+class PaymentAdminForm(forms.ModelForm):
+    class Meta:
+        model = Payment
+        fields = '__all__'
+
+    def init(self, *args, **kwargs):
+        super().init(*args, **kwargs)
+        # Ограничьте выбор "Оплату принял" только сотрудниками и суперпользователем
+        self.fields['who_created'].queryset = User.objects.filter(Q(is_staff=True) | Q(is_superuser=True))
 
 
 class LoginForm(forms.Form):
