@@ -12,7 +12,7 @@ urlpatterns = [
     path('vacancies-filter/', VacancyListCreateAPIView.as_view(), name='vacancies-filter'),
     path('vacancies-list/', VacancyListApiView.as_view(), name='vacancies-list'),
     #Review
-    
+    path('company-review-create/', CompanyReviewView.as_view(), name='company-review'),
     path('review-create', ReviewVacancyCreateView.as_view(), name='review-create'),
     path('review-get', ReviewVacancyListView.as_view(), name='review-get'),
     path('review-patch/<int:pk>/', ReviewVacancyUpdateView.as_view(), name='review-patch'),

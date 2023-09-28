@@ -30,22 +30,29 @@ class ContractAdmin(admin.ModelAdmin):
 @admin.register(Vacancy)
 class VacancyAdmin(admin.ModelAdmin):
     list_display =  [
-        'id', 'name', 'language', 'user', 'employer_company', 'required_positions', 'salary', 'city', 'destination_point','is_vacancy_confirmed',
+        'id', 'name', 'language', 'user', 'employer_company', 'required_positions', 'salary', 'city', 'destination_point','is_vacancy_confirmed','created_date',
     ]
     list_editable =('is_vacancy_confirmed',)
+    date_hierarchy = 'created_date'
 
 
 @admin.register(EmployerCompany)
 class EmployerCompanyAdmin(admin.ModelAdmin):
-    fields = ['user', 'name', 'country',]
+    fields = ['user', 'name', 'country', 'description',]
 
-    list_display = ['id', 'name', 'user', 'country',]
+    list_display = ['id', 'name', 'user', 'country', 'description',]
 
     search_fields = ['name', ]
 
-    inlines = [VacancyInline,]
-
-
+@admin.register(CompanyReview)
+class CompanyReviewAdmin(admin.ModelAdmin):
+    list_display = ('company', 'user', 'rating', 'is_review_confirmed', 'created_date')
+    list_filter = ('rating', 'is_review_confirmed', 'created_date')
+    search_fields = ('company__name', 'user__email', 'comment')  # предполагается, что у `EmployerCompany` есть поле `name` и у `User` есть поле `email`
+    list_editable = ('is_review_confirmed',)
+    readonly_fields = ('created_date', 'user', 'company', 'rating', 'comment') # чтобы некоторые поля были только для чтения
+    date_hierarchy = 'created_date'
+    ordering = ('-created_date', 'company')
 
 @admin.register(ProfileCounter)
 class ProfileCounterAdmin(admin.ModelAdmin):

@@ -162,6 +162,30 @@ class Vacancy(models.Model):
         verbose_name_plural = 'Вакансии'
 
 
+class CompanyReview(models.Model):
+    RATING_CHOICES = (
+        (1, '1 Star'),
+        (2, '2 Stars'),
+        (3, '3 Stars'),
+        (4, '4 Stars'),
+        (5, '5 Stars'),
+    )
+
+    company = models.ForeignKey(EmployerCompany, on_delete=models.CASCADE, related_name='reviews')
+    user = models.ForeignKey('accounts.User', on_delete=models.CASCADE, verbose_name='Пользователь')  # Предполагается, что отзыв может оставить зарегистрированный пользователь
+    rating = models.PositiveSmallIntegerField(choices=RATING_CHOICES, verbose_name='Рейтинг')
+    comment = models.TextField(verbose_name='Комментарий', blank=True)
+    is_review_confirmed = models.BooleanField('Прошел модерацию', default=False)
+    created_date = models.DateTimeField(auto_now_add=True, verbose_name='Дата публикации')
+
+    def __str__(self):
+        return f"{self.company} - {self.rating} Stars"
+
+    class Meta:
+        verbose_name = 'Отзыв о компании'
+        verbose_name_plural = 'Отзывы о компаниях'
+
+
 class ReviewVacancy(models.Model):
     PROFILE_CHOICES = (
         ('Одобрено', 'Одобрено'),

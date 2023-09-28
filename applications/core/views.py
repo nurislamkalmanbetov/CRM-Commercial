@@ -38,6 +38,33 @@ class EmployerCompanyView(generics.CreateAPIView):
     def post(self, request, *args, **kwargs):
         return self.create(request, *args, **kwargs)
 
+class CompanyReviewView(generics.CreateAPIView):
+    serializer_class = CompanyReviewSerializer
+    queryset = CompanyReview.objects.all()
+
+    def perform_create(self, serializer):
+        user_data = self.request.data.get('user')
+
+        try:
+            user = User.objects.get(email=user_data)
+        except User.DoesNotExist:
+            raise serializers.ValidationError({'detail': 'Пользователь не найден.'})
+
+
+        if not user.is_student:
+            raise serializers.ValidationError({'detail': 'К сожалению только студенты могут оставлять отзывы.'})
+
+       
+        if not user.is_active:
+            raise serializers.ValidationError({'detail': 'Ваш аккаунт не активен.'})
+        
+        serializer.save(user=user)
+
+
+    def post(self, request, *args, **kwargs):
+        return self.create(request, *args, **kwargs)
+
+
 class VacancyPagination(PageNumberPagination):
     page_size = 15
     page_size_query_param = 'page_size'

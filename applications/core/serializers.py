@@ -64,6 +64,19 @@ class VacancySerializers(serializers.ModelSerializer):
         vacancy = Vacancy.objects.update(employer_company=user.employer_company, **validated_data)
         return vacancy
 
+class CompanyReviewSerializer(serializers.ModelSerializer):
+    user = serializers.EmailField(source='user.email')
+    
+    class Meta:
+        model = CompanyReview
+        fields = ['id', 'company', 'user', 'rating', 'comment', 'created_date']
+
+    def create(self, validated_data):
+        user_email = validated_data.pop('user')
+        user = User.objects.get(email=user_email)
+        company_review= CompanyReview.objects.create(user=user, **validated_data)  # Используем **validated_data
+        return company_review
+    
 
 class VacancyFilterSerializer(serializers.ModelSerializer):
     class Meta:
