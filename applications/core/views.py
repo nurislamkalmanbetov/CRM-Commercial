@@ -18,6 +18,8 @@ from .serializers import *
 class EmployerCompanyView(generics.CreateAPIView):
     serializer_class = EmployerCompanySerialzers
     queryset = EmployerCompany.objects.all()
+    parser_classes = (MultiPartParser, FormParser)
+
 
     def perform_create(self, serializer):
         user_data = self.request.data.get('user')
@@ -37,6 +39,38 @@ class EmployerCompanyView(generics.CreateAPIView):
 
     def post(self, request, *args, **kwargs):
         return self.create(request, *args, **kwargs)
+
+
+class EmployerCompanyMixins(mixins.RetrieveModelMixin,
+                        mixins.UpdateModelMixin,
+                        mixins.DestroyModelMixin, GenericAPIView):
+    
+    queryset = EmployerCompany.objects.all()
+    serializer_class = EmployerCompanySerialzers
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['user__email']
+    parser_classes = (MultiPartParser, FormParser)
+
+
+    def patch(self, request, *args, **kwargs):
+        return self.partial_update(request, *args, **kwargs)
+
+    def delete(self, request, *args, **kwargs):
+        response = self.destroy(request, *args, **kwargs)
+        if response.status_code == status.HTTP_204_NO_CONTENT:
+            return Response({"message": "Успешно удалено"}, status=status.HTTP_200_OK)
+        return response
+
+
+class EmployerListApiView(ListAPIView):
+    serializer_class = EmployerCompanySerialzers
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['user__email']
+
+    def get_queryset(self):
+        return EmployerCompany.objects.all()
+
+
 
 class CompanyReviewView(generics.CreateAPIView):
     serializer_class = CompanyReviewSerializer

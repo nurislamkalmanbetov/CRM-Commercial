@@ -84,6 +84,7 @@ class ContractAdmin(models.Model):
 
 
 class EmployerCompany(models.Model):
+    icon = models.ImageField(upload_to='company_icons/', blank=True, verbose_name='Изображение')
     user = models.ForeignKey('accounts.User', on_delete=models.CASCADE, verbose_name='Работодатель')
     name = models.CharField(verbose_name='Название', max_length=255)
     country = models.CharField('страна', max_length=128, blank=True, default='')

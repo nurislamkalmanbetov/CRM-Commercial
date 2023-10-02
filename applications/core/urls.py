@@ -4,6 +4,9 @@ from .views import *
 
 urlpatterns = [
     path('employer-company-create/', EmployerCompanyView.as_view(), name='employer-company'),
+    
+    path('employer-company-list/', EmployerListApiView.as_view(), name='employer-company-list'),
+    path('employer-company-change-detail/<int:pk>/', EmployerCompanyMixins.as_view(), name='employer-company-change-detail'),
     #Vacancy
     path('vacancy/', VacancyListView.as_view(), name='vacancy'),
     path('vacancy-change-detail/<int:pk>/', VacancyChangeView.as_view(), name='vacancy-change-detail'),

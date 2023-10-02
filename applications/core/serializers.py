@@ -9,6 +9,7 @@ class EmployerCompanySerialzers(serializers.ModelSerializer):
         model = EmployerCompany
         fields = [
             'id',
+            'icon',
             'user',
             'name',
             'country',

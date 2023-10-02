@@ -189,7 +189,7 @@ class PaymentAdmin(admin.ModelAdmin):
 
 class StudentDocumentsAdmin(admin.ModelAdmin):
     list_display = [ 'user',
-        'photo', 'study_certificate', 'study_certificate_embassy', 'study_certificate_translate_embassy',
+        'photo', 'study_certificate_embassy_short', 'study_certificate_embassy', 'study_certificate_translate_embassy',
         'photo_for_schengen', 'zagranpassport_copy', 'passport_copy', 'fluorography_express',
         'fluorography', 'immatrikulation', 'transcript', 'transcript_translate', 'bank_statement',
         'conduct_certificate', 'mentaldispanser_certificate', 'drugdispanser_certificate', 'parental_permission',
@@ -198,6 +198,12 @@ class StudentDocumentsAdmin(admin.ModelAdmin):
         'liveplace_approve', 'insurance', 'visa_file'
     ]
     search_fields = ['user__email'] 
+
+    def study_certificate_embassy_short(self, obj):
+        if obj.study_certificate_embassy:
+            return str(obj.study_certificate_embassy)[:10] + "..."
+        return ""
+    study_certificate_embassy_short.short_description = 'Справка'
 
 admin.site.register(StudentDocumentsProfileProxy, StudentDocumentsAdmin)
 
