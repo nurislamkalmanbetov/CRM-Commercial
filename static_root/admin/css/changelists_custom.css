@@ -1,0 +1,505 @@
+/* CHANGELISTS */
+
+#changelist {
+  position: relative;
+  width: 100%;
+}
+
+#changelist table {
+  width: 100%;
+}
+
+.change-list .hiddenfields {
+  display: none;
+}
+
+.change-list .filtered table {
+  border-right: none;
+}
+
+.change-list .filtered {
+  min-height: 400px;
+}
+
+.change-list .filtered .results,
+.change-list .filtered .paginator,
+.filtered #toolbar,
+.filtered div.xfull {}
+
+.change-list .filtered table tbody th {
+  padding-right: 1em;
+}
+
+#changelist-form .results {
+  overflow-x: auto;
+  padding-bottom: 20px;
+  background-color: #fff;
+}
+
+#changelist .toplinks {
+  border-bottom: 1px solid #ddd;
+}
+
+#changelist .paginator {
+  color: #666;
+  border-bottom: 1px solid #eee;
+  background: #fff;
+  overflow: hidden;
+}
+
+/* CHANGELIST TABLES */
+
+#changelist table thead th {
+  padding: 0;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+#changelist table thead th.action-checkbox-column {
+  width: 1.5em;
+  text-align: center;
+}
+
+#changelist table tbody td.action-checkbox {
+  text-align: center;
+}
+
+#changelist table tfoot {
+  color: #666;
+}
+
+/* TOOLBAR */
+
+#changelist #toolbar {
+  padding: 8px 10px;
+  margin-bottom: 15px;
+  border-top: 1px solid #eee;
+  border-bottom: 1px solid #eee;
+  background: #f8f8f8;
+  color: #666;
+}
+
+#changelist #toolbar form input {
+  border-radius: 4px;
+  font-size: 14px;
+  padding: 5px;
+  color: #333;
+}
+
+#changelist #toolbar form #searchbar {
+  height: 19px;
+  border: 1px solid #ccc;
+  padding: 2px 5px;
+  margin: 0;
+  vertical-align: top;
+  font-size: 13px;
+}
+
+#changelist #toolbar form #searchbar:focus {
+  border-color: #999;
+}
+
+#changelist #toolbar form input[type="submit"] {
+  border: 1px solid #ccc;
+  padding: 2px 10px;
+  margin: 0;
+  vertical-align: middle;
+  background: #fff;
+  box-shadow: 0 -15px 20px -10px rgba(0, 0, 0, 0.15) inset;
+  cursor: pointer;
+  color: #333;
+}
+
+#changelist #toolbar form input[type="submit"]:focus,
+#changelist #toolbar form input[type="submit"]:hover {
+  border-color: #999;
+}
+
+#changelist #changelist-search img {
+  vertical-align: middle;
+  margin-right: 4px;
+}
+
+/* FILTER COLUMN */
+
+#changelist-filter {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 1000;
+  width: 240px;
+  background: #f8f8f8;
+  border-left: none;
+  margin: 0;
+}
+
+#changelist-filter h2 {
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 5px 15px;
+  margin-bottom: 12px;
+  border-bottom: none;
+}
+
+#changelist-filter h3 {
+  font-weight: 400;
+  font-size: 14px;
+  padding: 0 15px;
+  margin-bottom: 10px;
+}
+
+#changelist-filter ul {
+  margin: 5px 0;
+  padding: 0 15px 15px;
+  border-bottom: 1px solid #eaeaea;
+}
+
+#changelist-filter ul:last-child {
+  border-bottom: none;
+  padding-bottom: none;
+}
+
+#changelist-filter li {
+  list-style-type: none;
+  margin-left: 0;
+  padding-left: 0;
+}
+
+#changelist-filter a {
+  display: block;
+  color: #999;
+  text-overflow: ellipsis;
+  overflow-x: hidden;
+}
+
+#changelist-filter li.selected {
+  border-left: 5px solid #eaeaea;
+  padding-left: 10px;
+  margin-left: -15px;
+}
+
+#changelist-filter li.selected a {
+  color: #5b80b2;
+}
+
+#changelist-filter a:focus,
+#changelist-filter a:hover,
+#changelist-filter li.selected a:focus,
+#changelist-filter li.selected a:hover {
+  color: #036;
+}
+
+/* DATE DRILLDOWN */
+
+.change-list ul.toplinks {
+  display: block;
+  float: left;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+}
+
+.change-list ul.toplinks li {
+  padding: 3px 6px;
+  font-weight: bold;
+  list-style-type: none;
+  display: inline-block;
+}
+
+.change-list ul.toplinks .date-back a {
+  color: #999;
+}
+
+.change-list ul.toplinks .date-back a:focus,
+.change-list ul.toplinks .date-back a:hover {
+  color: #036;
+}
+
+/* PAGINATOR */
+
+.paginator {
+  font-size: 13px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  line-height: 22px;
+  margin: 0;
+  border-top: 1px solid #ddd;
+}
+
+.paginator a:link,
+.paginator a:visited {
+  padding: 2px 6px;
+  background: #79aec8;
+  text-decoration: none;
+  color: #fff;
+}
+
+.paginator a.showall {
+  padding: 0;
+  border: none;
+  background: none;
+  color: #5b80b2;
+}
+
+.paginator a.showall:focus,
+.paginator a.showall:hover {
+  background: none;
+  color: #036;
+}
+
+.paginator .end {
+  margin-right: 6px;
+}
+
+.paginator .this-page {
+  padding: 2px 6px;
+  font-weight: bold;
+  font-size: 13px;
+  vertical-align: top;
+}
+
+.paginator a:focus,
+.paginator a:hover {
+  color: white;
+  background: #036;
+}
+
+/* ACTIONS */
+
+.filtered .actions {
+  margin-right: 280px;
+  border-right: none;
+}
+
+#changelist table input {
+  margin: 0;
+  vertical-align: baseline;
+}
+
+#changelist table tbody tr.selected {
+  background-color: #ffffcc;
+}
+
+#changelist .actions {
+  padding: 10px;
+  background: #fff;
+  border-top: none;
+  border-bottom: none;
+  line-height: 24px;
+  color: #999;
+}
+
+#changelist .actions.selected {
+  background: #fffccf;
+  border-top: 1px solid #fffee8;
+  border-bottom: 1px solid #edecd6;
+}
+
+#changelist .actions span.all,
+#changelist .actions span.action-counter,
+#changelist .actions span.clear,
+#changelist .actions span.question {
+  font-size: 13px;
+  margin: 0 0.5em;
+  display: none;
+}
+
+#changelist .actions:last-child {
+  border-bottom: none;
+}
+
+#changelist .actions select {
+  vertical-align: top;
+  height: 24px;
+  background: none;
+  color: #000;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+  padding: 0 0 0 4px;
+  margin: 0;
+  margin-left: 10px;
+}
+
+#changelist .actions select:focus {
+  border-color: #999;
+}
+
+#changelist .actions label {
+  display: inline-block;
+  vertical-align: middle;
+  font-size: 13px;
+}
+
+#changelist .actions .button {
+  font-size: 13px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background: #fff;
+  box-shadow: 0 -15px 20px -10px rgba(0, 0, 0, 0.15) inset;
+  cursor: pointer;
+  height: 24px;
+  line-height: 1;
+  padding: 4px 8px;
+  margin: 0;
+  color: #333;
+}
+
+#changelist .actions .button:focus,
+#changelist .actions .button:hover {
+  border-color: #999;
+}
+
+.filters-wrapper {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  grid-row-gap: 22px;
+  grid-column-gap: 15px;
+  margin-bottom: 20px;
+  width: calc(100vw - 52px);
+}
+
+.filter {
+  background-color: #fff;
+}
+
+.filter_wide {
+  grid-column: span 3;
+}
+
+.filter-title {
+  font-size: 12px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  line-height: 1;
+  font-weight: 500;
+  background-color: #5e6476;
+  color: #fff;
+  padding: 6px 8px;
+  margin: 0 !important;
+}
+
+.filter-select-wrapper {
+  padding: 10px 15px;
+}
+
+.date-filter-select-wrapper {
+  padding: 10px 15px;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-gap: 15px;
+  align-items: flex-start;
+}
+
+.date-filter-select-wrapper p {
+  margin: 0 !important;
+  font-size: 13px !important;
+  line-height: 0 !important;
+}
+
+.filter-select {
+  width: 100%;
+  font-size: 12px;
+}
+
+.results-list-wrapper {
+  width: calc(100vw - 52px);
+  overflow-x: scroll;
+}
+
+.paginator {
+  background: none !important;
+  border: none !important;
+}
+
+.paginator a {
+  background-color: #c4c4c4 !important;
+}
+
+.paginator a.showall {
+  background: none !important;
+}
+
+.not_confirmed table {
+  width: 100% !important;
+}
+
+.confirmed table {
+  width: 100% !important;
+}
+
+.interview table {
+  width: 100% !important;
+}
+
+.contacts table {
+  width: 100% !important;
+}
+
+.vacancy table {
+  width: 100% !important;
+}
+
+.embassy table {
+  width: 100% !important;
+}
+
+.payment table {
+  width: 100% !important;
+}
+
+#changelist table thead th {
+  font-size: 10px;
+}
+
+#result_list tbody>tr>td {
+  font-size: 10px;
+}
+
+.note_form,
+.comment_form {
+  grid-template-columns: 4fr 1fr;
+  display: grid;
+}
+
+.note_form_text,
+.comment_form_text {
+  min-width: 5px;
+  min-height: 15.56px;
+  grid-column: 1/3;
+  word-wrap: break-word;
+
+}
+
+.note_form__input,
+.comment_form__input {
+  border-radius: 3px;
+  border: 1px solid #ccc;
+  padding: 4px 6px;
+  width: 100px;
+  margin-right: 10px !important;
+}
+
+.note_form__button,
+.comment_form__button {
+  border-radius: 100%;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  padding: 0 6px;
+}
+
+.note_form__button img,
+.comment_form__button img {
+  width: 12px;
+}
+
+.note_form__button {
+  background-color: #512da8;
+}
+
+.comment_form__button {
+  background-color: #388e3c;
+}

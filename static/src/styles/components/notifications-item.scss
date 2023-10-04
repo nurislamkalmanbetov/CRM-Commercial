@@ -1,0 +1,56 @@
+.notifications-item {
+  position: relative;
+  padding: 8px 10px 22px;
+  background-color: #e7e7e7;
+  @media screen and (min-width: $screen-s) {
+    padding: 12px;
+    max-width: 970px;
+  }
+  
+  &_new {
+    .notifications-item__title {
+      &:after {
+        content: 'New';
+        color: #27AE60;
+        font-size: 12px;
+        line-height: 16px;
+        font-weight: 600;
+        margin-left: 19px;
+      }
+    }
+  }
+
+  &__title {
+    font-size: 10px;
+    font-weight: 600;
+    line-height: 14px;
+    display: block;
+    @media screen and (min-width: $screen-s) {
+      margin-bottom: 5px;
+      font-size: 12px;
+    }
+  }
+  &__text {
+    font-size: 12px;
+    line-height: 16px;
+    color: #2f80ed;
+    text-decoration: underline;
+    display: block;
+    @media screen and (min-width: $screen-s) {
+      font-size: 12px;
+      line-height: 20px;
+    }
+  }
+  &__time {
+    position: absolute;
+    right: 12px;
+    bottom: 8px;
+    color: #7c7c7c;
+    font-size: 10px;
+    line-height: 14px;
+    @media screen and (min-width: $screen-s) {
+      font-size: 12px;
+      line-height: 14px;
+    }    
+  }
+}

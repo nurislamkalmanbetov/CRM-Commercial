@@ -1,0 +1,1 @@
+{"code":"import Select from './Select';\r\nexport default (function () {\r\n    var SELECT_QUERY = '.select-wrapper';\r\n    var selects = document.querySelectorAll(SELECT_QUERY);\r\n    selects.forEach(function (select) {\r\n        new Select(select);\r\n    });\r\n});\r\n","references":["/Users/roman/work/iwex-crm/iwex_crm/static/src/components/forms/select/Select.ts"]}

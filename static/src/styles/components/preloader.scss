@@ -1,0 +1,38 @@
+.preloader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: all .3s ease;
+  &_show {
+    visibility: visible;
+    opacity: 1;
+  }
+
+  &__progress {
+    position: relative;
+    margin-top: 14px;
+    width: 244px;
+    height: 4px;
+    border-radius: 2px;
+    background-color: #dadada;
+    &-line {
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: 0;
+      height: 4px;
+      border-radius: 2px;
+      background-color: #FECF1D;
+      transition: width .15s ease;
+    }
+  }
+}

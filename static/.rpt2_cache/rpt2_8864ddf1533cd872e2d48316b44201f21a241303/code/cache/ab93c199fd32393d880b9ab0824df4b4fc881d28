@@ -1,0 +1,1 @@
+{"code":"import createDocumentItems from './createDocumentItems';\r\nexport default createDocumentItems;\r\n","references":["/Users/roman/work/iwex-crm/iwex_crm/static/src/components/shared/document-item/createDocumentItems.ts"]}

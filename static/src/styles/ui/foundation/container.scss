@@ -1,0 +1,10 @@
+// Container block need for wrapping each page in the app.
+// Modificators: 
+
+.container {
+  padding-left: 16px;
+  padding-right: 16px;
+  @media screen and (min-width: $screen-s) {
+    padding: 0;
+  }
+}

@@ -1,0 +1,291 @@
+.personal-page {
+  @media screen and (min-width: $screen-s) {
+    margin: 48px 60px 63px;
+    background-color: #fff;
+    box-shadow: var(--default-box-shadow);
+    padding: 40px 30px;
+  }
+  &__title {
+    font-weight: bold;
+    font-size: 18px;
+    line-height: 25px;
+    margin-bottom: 24px;
+    @media screen and (min-width: $screen-s) {
+      font-weight: 600;
+      font-size: 18px;
+      line-height: 30px;
+      margin-bottom: 30px;
+    }
+
+  }
+
+  &__subtitle {
+    padding-left: 30px;
+    font-size: 18px;
+    line-height: 25px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    background-size: 20px 20px;
+    background-repeat: no-repeat;
+    background-position: 0 center;
+    @media screen and (min-width: $screen-s) {
+      font-size: 16px;
+      display: flex;
+      justify-content: space-between;
+    }
+  }
+
+  &__text {
+    font-size: 12px;
+    line-height: 16px;
+    display: block;
+  }
+
+  &__content {
+    @media screen and (min-width: $screen-s) {
+      margin-top: 46px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(299px, 299px));
+      grid-gap: 21px;
+    }
+    
+  }
+
+  &__desktop-text {
+    position: relative;
+    width: 24px;
+    height: 24px;
+    background-image: url("https://iwex-crm-bucket.s3.amazonaws.com/static/images/icons/question.svg");
+    background-size: 24px 24px;
+    background-repeat: no-repeat;
+    background-position: center;
+    cursor: pointer;
+    display: none;
+    @media screen and (min-width: $screen-s) {
+      display: block;
+    }
+    &:hover {
+      .personal-page__desktop-text-content {
+        opacity: 1;
+        visibility: visible;
+      }
+    }
+    &-content {
+      top: -100px;
+      left: 30px;
+      opacity: 0;
+      visibility: hidden;
+      transition: all .3s ease;
+      position: absolute;
+      min-width: 300px;
+      height: 100px;
+      box-sizing: border-box;
+      font-weight: normal;
+      font-size: 11px;
+      line-height: 15px;
+      padding: 17px 12px;
+      background-color: var(--yellow-color);
+      border-radius: 4px;
+      box-shadow: var(--default-box-shadow);
+      &:before {
+        position: absolute;
+        content: '';
+        width: 0;
+        height: 0;
+        border-style: solid;
+        border-width: 20px 10px 0 10px;
+        border-color: var(--yellow-color) transparent transparent transparent;
+        bottom: -10px;
+        left: -10px;
+        transform: rotate(45deg);
+      }
+
+      &_left {
+        left: auto;
+        right: 30px;
+        &:before {
+          position: absolute;
+          content: '';
+          width: 0;
+          height: 0;
+          border-style: solid;
+          border-width: 20px 10px 0 10px;
+          border-color: var(--yellow-color) transparent transparent transparent;
+          bottom: -10px;
+          right: -10px;
+          left: auto;
+          transform: rotate(-45deg);
+        }
+      }
+    }
+  }
+}
+
+.profile {
+  margin-bottom: 13px;
+  &__title {
+    background-image: url("https://iwex-crm-bucket.s3.amazonaws.com/static/images/icons/profile.svg");
+  }
+
+  &__content {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    @media screen and (min-width: $screen-s) {
+      align-items: flex-start;
+    }
+  }
+
+  &__photo {
+    border-radius: 100%;
+    width: 71px;
+    height: 71px;
+    @media screen and (min-width: $screen-s) {
+      width: 106px;
+      height: 127px;
+      border-radius: 4px;
+      background-color: #d5d5d5;
+    }
+  }
+
+  &__info {
+    margin-left: 15px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    @media screen and (min-width: $screen-s) {
+      grid-template-columns: 1fr 1fr 1fr;
+      grid-column-gap: 80px;
+      grid-row-gap: 17px;
+    }
+    &-fullname {
+      grid-column: 1/3;
+      font-size: 14px;
+      line-height: 19px;
+      margin-bottom: 6px;
+      @media screen and (min-width: $screen-s) {
+        grid-column: 1/4;
+        font-size: 18px;
+        line-height: 22px;
+        font-weight: 600;
+        margin-bottom: 5px;
+      }
+
+    }
+    &-item {
+      &-name {
+        display: none;
+        @media screen and (min-width: $screen-s) {
+          display: block;
+          font-size: 12px;
+          color: #7c7c7c;
+        }
+        
+      }
+      &-text {
+        font-size: 12px;
+        line-height: 16px;
+        @media screen and (min-width: $screen-s) {
+          font-size: 14px;
+          line-height: 20px;
+        }
+      }
+    }
+    &-name {
+      @media screen and (min-width: $screen-s) {
+        grid-column: 1/3;
+      }
+    }
+  }
+}
+
+.questionnaire {
+  margin-top: 12px;
+  @media screen and (min-width: $screen-s) {
+    margin-top: 0;
+  }
+  &__title {
+    background-image: url("https://iwex-crm-bucket.s3.amazonaws.com/static/images/icons/questionnaire.svg");
+  }
+
+  &__text {
+    margin-bottom: 14px;
+    @media screen and (min-width: $screen-s) {
+      display: none;
+    }
+
+  }
+}
+
+.documents {
+  margin-top: 30px;
+  @media screen and (min-width: $screen-s) {
+    grid-column: 2/4;
+    margin-top: 0;
+  }
+  &__title {
+    background-image: url("https://iwex-crm-bucket.s3.amazonaws.com/static/images/icons/documents.svg");
+  }
+
+  &__subtitle {
+    margin-top: -8px;
+    @media screen and (min-width: $screen-s) {
+      display: none;
+    }
+  }
+
+  &__text{
+    margin-top: 14px;
+    @media screen and (min-width: $screen-s) {
+      display: none;
+    }
+  }
+
+  &__cards {
+    @media screen and (min-width: $screen-s) {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-gap: 21px;
+    }
+  }
+}
+
+.files {
+  margin-top: 30px;
+  @media screen and (min-width: $screen-s) {
+    margin-top: 0;
+  }
+  &__title {
+    background-image: url("https://iwex-crm-bucket.s3.amazonaws.com/static/images/icons/documents.svg");
+  }
+
+  &__text {
+    @media screen and (min-width: $screen-s) {
+      display: none;
+    }
+  }
+}
+
+.notifications {
+  margin-top: 12px;
+  @media screen and (min-width: $screen-s) {
+    margin-top: 50px;
+    width: 75%;
+    box-sizing: border-box;
+  }
+  &__title {
+    background-image: url("https://iwex-crm-bucket.s3.amazonaws.com/static/images/icons/notifications.svg");
+  }
+
+  &__link {
+    display: block;
+    text-align: right;
+    margin-top: 6px;
+  }
+
+  &__all {
+    color: #2F80ED;
+    font-size: 12px;
+    line-height: 16px;
+    text-decoration: underline;
+  }
+}

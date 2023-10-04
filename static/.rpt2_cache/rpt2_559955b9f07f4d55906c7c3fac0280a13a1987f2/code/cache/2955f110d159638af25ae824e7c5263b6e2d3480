@@ -1,0 +1,1 @@
+{"code":"import createForms from './createForms';\r\nexport default createForms;\r\n","references":["/Users/roman/work/iwex-crm/iwex_crm/static/src/components/forms/form/createForms.ts"]}

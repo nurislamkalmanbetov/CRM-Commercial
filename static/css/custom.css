@@ -1,0 +1,19 @@
+thead th {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background-color: white;
+}
+    
+
+.table-responsive {
+    overflow-x: visible;
+    overflow-y: visible;
+}
+
+.table-responsive thead th {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background-color: white;
+}

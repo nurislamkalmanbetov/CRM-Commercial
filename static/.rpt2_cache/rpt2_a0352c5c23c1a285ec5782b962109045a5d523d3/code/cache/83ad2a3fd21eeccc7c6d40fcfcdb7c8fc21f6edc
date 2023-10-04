@@ -1,0 +1,1 @@
+{"code":"import LOGIN_VALIDATION_SCHEMA from './login';\r\nexport { LOGIN_VALIDATION_SCHEMA, };\r\n","references":["/home/romanch/work/iwex-crm/iwex_crm/static/src/validations/login.ts"]}
