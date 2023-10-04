@@ -4,10 +4,8 @@ services:
     image: postgres:15
     env_file:
       - .env
-    networks:
-      - local
     ports:
-      - "5432:5432"
+      - "5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
 
@@ -24,64 +22,19 @@ services:
       - 443:443
       - 80:80
 
-  redis:
-    image: "redis:6.2.5-alpine"
-    networks:
-      - local
-
   app:
     build: . 
     restart: always
-    command: sh -c "python3 /app/manage.py migrate && python3 /app/manage.py collectstatic --noinput && uwsgi --ini /etc/uwsgi.conf"
+    command: >
+          bash -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8005"
+    ports:
+          - "8005:8005"
     env_file:
       - .env
-    networks:
-      - local
-    volumes:
-      - ./denv:/app/iwex_crm/.env
-      - statics:/app/static_root
-      - medias:/app/media
-      - common_files:/common_files
     depends_on:
-      - nginx
       - db
-      - redis
 
-  celery:
-    build: . 
-    restart: always
-    command: celery -A iwex_crm worker -l info
-    networks:
-      - local
-    env_file:
-      - .env
-    volumes:
-      - ./denv:/app/iwex_crm/.env
-    depends_on:
-      - app
-      - db
-      - redis
-
-  celery-beat:
-    build: . 
-    restart: always
-    command: celery -A iwex_crm beat -l info
-    networks:
-      - local
-    env_file:
-      - .env
-    volumes:
-      - ./denv:/app/iwex_crm/.env
-    depends_on:
-      - app
-      - db
-      - redis
-
-networks:
-  local:
 
 volumes:
   pgdata:
-  common_files:
-  statics:
-  medias:
+

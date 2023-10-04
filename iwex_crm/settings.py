@@ -17,7 +17,9 @@ from sentry_sdk.integrations.django import DjangoIntegration
 
 import django.conf.locale
 from django.conf import global_settings
-
+import environ
+env = environ.Env()
+environ.Env.read_env(env_file='.env')
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -56,7 +58,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'modeltranslation',
     'easy_thumbnails',
     'storages',
     'applications.accounts',
@@ -67,7 +68,6 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'rest_framework_simplejwt',
     'corsheaders',
-    'imagekit',
 
 ]
 REST_FRAMEWORK = {
@@ -125,11 +125,11 @@ WSGI_APPLICATION = 'iwex_crm.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'iwexs1',
-        'USER': 'postgres',
-        'PASSWORD': '123',
-        'HOST': 'localhost',
-        'PORT':  '5432',
+        'NAME': env('POSTGRES_DB'),
+        'USER': env('POSTGRES_USER'),
+        'PASSWORD':  env('POSTGRES_PASSWORD'),
+        'HOST': env('POSTGRES_HOST'),
+        'PORT': env('POSTGRES_PORT'),
     }
 }
 
