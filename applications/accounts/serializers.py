@@ -33,6 +33,14 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         return data
 
 
+class PasswordResetRequestSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+
+class PasswordResetConfirmSerializer(serializers.Serializer):
+    token = serializers.CharField()
+    password = serializers.CharField(write_only=True)
+
+
 class ProfileSerializer(serializers.ModelSerializer):
     user = serializers.EmailField(source='user.email')
     university = serializers.CharField(source='university.name_ru')
@@ -163,5 +171,8 @@ class MessageSerializer(serializers.ModelSerializer):
         return message
 
 
-
+class AnnouncementSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Announcement
+        fields = '__all__'
 

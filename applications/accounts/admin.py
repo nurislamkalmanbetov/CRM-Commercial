@@ -90,33 +90,63 @@ class ProfileInVacancyAdmin(admin.ModelAdmin):
     autocomplete_fields = ['employer',]
 
 
-class ProfileAdmin(admin.ModelAdmin):
-    list_display = ('id', 'user', 'photo', 'first_name', 'last_name', 'telephone',
-        'bday', 'gender','been_to_germany', 'nationality', 'birth_country','reg_apartment',
+from django.utils.html import format_html
+from .pdf_utils import generate_profile_pdf
+from django.http import FileResponse
 
-        )
+class ProfileAdmin(admin.ModelAdmin):
+    
+    def thumbnail(self, obj):
+        if obj.photo and hasattr(obj.photo, 'url'):
+            return format_html('<img src="{}" style="width: 50px; height: 50px;"/>', obj.photo.url)
+        return "Фото отсутствует"
+
+    thumbnail.short_description = 'Фото'
+
+    def change_view(self, request, object_id, form_url='', extra_context=None):
+        extra_context = extra_context or {}
+        profile = Profile.objects.get(pk=object_id)
+        pdf_url = reverse('export_pdf', args=[profile.pk])
+        extra_context['pdf_url'] = pdf_url
+        return super().change_view(request, object_id, form_url, extra_context)
+
+
+    def download_pdf(self, request, object_id):
+        profile = Profile.objects.get(pk=object_id)
+        buffer = generate_profile_pdf(profile)
+        return FileResponse(buffer, content_type='application/pdf', filename=f"profile_{profile.id}.pdf")
+
+    def get_urls(self):
+        from django.urls import path
+        urls = super().get_urls()
+        custom_urls = [
+            path('<int:object_id>/download/', self.admin_site.admin_view(self.download_pdf), name="profile_download_pdf")
+        ]
+        return custom_urls + urls
+
+    list_display = ('thumbnail', 'id', 'user', 'first_name', 'last_name', 'telephone',
+                    'bday', 'gender','been_to_germany', 'nationality', 'birth_country','reg_apartment')
+    
     fieldsets = (
         (None, {'fields': ('user', 'photo', 'first_name', 'last_name', 'telephone',
-        'bday', 'gender','been_to_germany', 'nationality', 'birth_country','reg_apartment',
-        'university','faculty','study_start','study_end','direction',
-        'german', 'english', 'turkish', 'russian', 'chinese', 
-        'driver_license', 'driving_experience', 'cat_a', 'cat_b', 'cat_c', 'cat_d', 'cat_e', 'tractor', 'transmission', 
-        'reading', 'singing', 'travelling', 'yoga', 'dancing', 'sport', 'drawing', 'computer_games', 'guitar', 'films', 'music', 'knitting', 'cooking', 'fishing', 'photographing', 
-        )}),
-            )
+                           'bday', 'gender','been_to_germany', 'nationality', 'birth_country','reg_apartment',
+                           'university','faculty','study_start','study_end','direction',
+                           'german', 'english', 'turkish', 'russian', 'chinese', 
+                           'driver_license', 'driving_experience', 'cat_a', 'cat_b', 'cat_c', 'cat_d', 'cat_e', 'tractor', 'transmission', 
+                           'reading', 'singing', 'travelling', 'yoga', 'dancing', 'sport', 'drawing', 'computer_games', 'guitar', 'films', 'music', 'knitting', 'cooking', 'fishing', 'photographing')}),
+    )
+    
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
             'fields': ('user', 'photo', 'first_name', 'last_name', 'telephone',
-        'bday', 'gender','been_to_germany', 'nationality', 'birth_country','reg_apartment',
-        'university','faculty','study_start','study_end','direction',
-        'german', 'english', 'turkish', 'russian', 'chinese', 
-        'driver_license', 'driving_experience', 'cat_a', 'cat_b', 'cat_c', 'cat_d', 'cat_e', 'tractor', 'transmission', 
-        'reading', 'singing', 'travelling', 'yoga', 'dancing', 'sport', 'drawing', 'computer_games', 'guitar', 'films', 'music', 'knitting', 'cooking', 'fishing', 'photographing', 
-        ),
+                       'bday', 'gender','been_to_germany', 'nationality', 'birth_country','reg_apartment',
+                       'university','faculty','study_start','study_end','direction',
+                       'german', 'english', 'turkish', 'russian', 'chinese', 
+                       'driver_license', 'driving_experience', 'cat_a', 'cat_b', 'cat_c', 'cat_d', 'cat_e', 'tractor', 'transmission', 
+                       'reading', 'singing', 'travelling', 'yoga', 'dancing', 'sport', 'drawing', 'computer_games', 'guitar', 'films', 'music', 'knitting', 'cooking', 'fishing', 'photographing'),
         }),
     )
-
 
     class Meta:
         model = Profile
@@ -248,8 +278,37 @@ class ProfileInContactDetailsAdmin(admin.ModelAdmin):
         return obj.mother_phone
 
     get_mother_phone.short_description = 'Mother Phone'
-    
 
+
+from django.contrib import admin
+from django.contrib import messages
+from django.core.mail import send_mail
+from django.utils.safestring import mark_safe
+from django.urls import reverse
+from .models import Announcement
+from .forms import AnnouncementForm
+
+class AnnouncementAdmin(admin.ModelAdmin):
+    form = AnnouncementForm  # Используем нашу форму для административной панели
+    list_display = ('title', 'send_to_students', 'send_to_employers', 'get_specific_student_name', 'get_specific_employer_name')
+
+    def get_specific_student_name(self, obj):
+        # Метод для отображения имени выбранного студента
+        return obj.specific_student.username if obj.specific_student else "N/A"
+
+    get_specific_student_name.short_description = "Specific Student"  # Название столбца
+
+    def get_specific_employer_name(self, obj):
+        # Метод для отображения имени выбранного работодателя
+        return obj.specific_employer.name if obj.specific_employer else "N/A"
+
+    get_specific_employer_name.short_description = "Specific Employer"  # Название столбца
+
+admin.site.register(Announcement, AnnouncementAdmin)
+
+
+    
+ 
 admin.site.register(ProfileInContactDetails, ProfileInContactDetailsAdmin)
 admin.site.register(Payment,PaymentAdmin)
 admin.site.register(Staff)

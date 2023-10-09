@@ -46,6 +46,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField('Активен', default=True)
     is_delete = models.BooleanField('Удален', default=False)
     registered_at = models.DateTimeField('Дата регистрации', auto_now_add=True)
+    password_reset_token = models.CharField(max_length=255, null=True, blank=True)
+
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
@@ -67,6 +69,7 @@ class User(AbstractBaseUser, PermissionsMixin):
             self.save()
         else:
             self.delete()
+
 
 
 class Message(models.Model):
@@ -95,7 +98,6 @@ class Message(models.Model):
 
     class Meta:
         ordering = ['-timestamp']
-
 
 
 def get_due_date():
@@ -1009,6 +1011,26 @@ class StudentDocumentsProfileProxy(Profile):
         proxy = True
         verbose_name = "Документ Студента"
         verbose_name_plural = "Документы Студентов"
+
+
+
+class Announcement(models.Model):
+    title = models.CharField(max_length=100)
+    content = models.TextField(blank=True, null=True)
+    photo = models.ImageField(upload_to='announcements/', blank=True, null=True)
+    video = models.URLField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    send_to_students = models.BooleanField(default=False, verbose_name='Отправить студентам')
+    send_to_employers = models.BooleanField(default=False, verbose_name='Отправить работодателям')
+
+    class Meta:
+        verbose_name = 'Объявление'
+        verbose_name_plural = 'Объявления'
+
+    def __str__(self):
+        return self.title
+
 
 
 class Interview(models.Model):

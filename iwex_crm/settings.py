@@ -80,9 +80,8 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'corsheaders',
 
+    # excel
     'import_export',
-   
-
 ]
 
 
@@ -203,6 +202,8 @@ EXTRA_LANG_INFO = {
 }
 
 JQUERY_URL = True
+USE_DJANGO_JQUERY = True
+
 
 LANG_INFO = dict(django.conf.locale.LANG_INFO.items())
 LANG_INFO.update(EXTRA_LANG_INFO.items())

@@ -307,3 +307,36 @@ class CheckboxSelectAdmin(ChoiceWidget):
 class ManagersListForm(forms.Form):
     manager = forms.ModelChoiceField(queryset=Staff.objects.all(),
                                      widget=forms.Select(attrs={'class': 'form-control'}))
+
+
+from .models import Announcement
+
+
+class AnnouncementForm(forms.ModelForm):
+    title = forms.CharField(label="Title")
+    content = forms.CharField(label="Content", widget=forms.Textarea)
+    photo = forms.ImageField(label="Photo", required=False)
+    video = forms.URLField(label="Video", required=False)
+    send_to_students = forms.BooleanField(label="Отправить студентам", required=False)
+    send_to_employers = forms.BooleanField(label="Отправить работодателям", required=False)
+    specific_student = forms.ModelChoiceField(
+        label="Отправить определенному студенту",
+        queryset=User.objects.filter(is_student=True, is_active=True),
+        required=False,
+        empty_label="Выберите студента",
+    )
+    specific_employer = forms.ModelChoiceField(
+        label="Отправить определенному работадателю",
+        queryset=User.objects.filter(is_employer=True, is_active=True),
+        required=False,
+        empty_label="Выберите работадателя",
+    )
+
+    class Meta:
+        model = Announcement
+        fields = ['title', 'content', 'photo', 'video', 'send_to_students', 'send_to_employers', 'specific_student', 'specific_employer']
+
+
+
+
+

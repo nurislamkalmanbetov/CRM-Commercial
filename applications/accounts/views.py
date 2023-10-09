@@ -3,12 +3,13 @@ from django.core.mail import send_mail
 from django.http import HttpResponse
 from django.utils import timezone
 from django_filters.rest_framework import DjangoFilterBackend
+from django.template.loader import render_to_string
 from drf_yasg2.utils import swagger_auto_schema
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import (exceptions, filters, generics, mixins, permissions,
                             status, viewsets)
 from rest_framework.decorators import action
-from rest_framework.generics import GenericAPIView, ListAPIView, UpdateAPIView
+from rest_framework.generics import GenericAPIView, ListAPIView, UpdateAPIView, CreateAPIView
 from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.response import Response
 from rest_framework.status import HTTP_201_CREATED
@@ -20,6 +21,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from .models import Profile
 from .serializers import *
 from .serializers import UserLoginSerializer
+import uuid
 
 User = get_user_model()
 
@@ -61,6 +63,51 @@ class UserLoginView(generics.CreateAPIView):
 
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
+
+# _ 
+
+
+class PasswordResetRequestView(CreateAPIView):
+    serializer_class = PasswordResetRequestSerializer
+
+    def create(self, request, *args, **kwargs):
+        email = request.data.get('email')
+        user = User.objects.filter(email=email).first()
+        if user:
+            token = uuid.uuid4()
+            user.password_reset_token = str(token)
+            user.save()
+
+            # Подготовка и отправка письма
+            context = {
+                'reset_link': f'http://127.0.0.1:8001/password_reset_confirm/{token}/',
+                'token': token  # передаем токен в контекст для шаблона
+            }
+            html_content = render_to_string('email_templates/password_reset_email.html', context)
+            send_mail(
+                'Сброс пароля',
+                '',  # пустое тело для текстовой версии
+                'from@example.com',
+                [email],
+                fail_silently=False,
+                html_message=html_content
+            )
+        return Response({'detail': 'Если адрес электронной почты существует, ссылка для сброса пароля была отправлена.'})
+    
+
+class PasswordResetConfirmView(CreateAPIView):
+    serializer_class = PasswordResetConfirmSerializer
+
+    def create(self, request, *args, **kwargs):
+        token = kwargs.get('token')
+        password = request.data.get('password')
+        user = User.objects.filter(password_reset_token=token).first()
+        if user:
+            user.set_password(password)
+            user.password_reset_token = None  # очистить токен после его использования
+            user.save()
+            return Response({'detail': 'Пароль успешно обновлен.'})
+        return Response({'error': 'Неверный токен или он истек.'})
 
 
 class ProfileView(generics.CreateAPIView):
@@ -209,9 +256,19 @@ class UserListView(viewsets.ModelViewSet):
     parser_classes = (MultiPartParser, FormParser)
 
 
-from django.shortcuts import render
+class AnnouncementViewSet(viewsets.ModelViewSet):
+    queryset = Announcement.objects.all()
+    serializer_class = AnnouncementSerializer
 
-def admin_dashboard(request):
-    # Здесь можно добавить какую-либо логику, если нужно
-    return render(request, 'admin_dashboard.html')
+
+from django.http import FileResponse
+from .models import Profile
+from .pdf_utils import generate_profile_pdf
+
+def generate_profile_pdf_view(request, pk):
+    profile = Profile.objects.get(pk=pk)
+    buffer = generate_profile_pdf(profile)
+    
+    return FileResponse(buffer, as_attachment=True, filename=f'profile_{profile.id}.pdf')
+
 
