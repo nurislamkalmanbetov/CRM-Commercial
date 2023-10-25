@@ -1,4 +1,4 @@
-from django.contrib import admin
+from django.contrib import admin, messages
 
 from .models import *
 from applications.accounts.admin_utils.inlines import VacancyInline
@@ -46,7 +46,6 @@ class VacancyAdmin(admin.ModelAdmin):
     ]
 
 
-
 @admin.register(ProfileCounter)
 class ProfileCounterAdmin(admin.ModelAdmin):
     list_display = ['creation_date', 'amount_of_profiles', ]
@@ -61,9 +60,19 @@ class TariffAdmin(admin.ModelAdmin):
 
 @admin.register(ReviewVacancy)
 class ReviewVacancyAdmin(admin.ModelAdmin):
-    list_display = ['status','applicant_profile','employer','vacancy','employer_comment']
-
+    list_display = ['status', 'applicant_profile', 'employer', 'vacancy', 'employer_comment']
     search_fields = ['status']
+
+    def save_model(self, request, obj, form, change):
+        if not obj.employer.is_active:
+            messages.add_message(request, messages.ERROR, 'Работодатель не активен и не может отправлять сообщения.')
+            return  # Если работодатель не активен, модель не будет сохранена
+
+        if not obj.employer.is_employer:
+            messages.add_message(request, messages.ERROR, 'Только работодатели могут отправлять сообщения.')
+            return  # Если пользователь не является работодателем, модель не будет сохранена
+
+        super().save_model(request, obj, form, change)
 
 
 @admin.register(CompanyReview)
@@ -75,5 +84,42 @@ class CompanyReviewAdmin(admin.ModelAdmin):
     readonly_fields = ('created_date', 'user', 'company', 'rating', 'comment') # чтобы некоторые поля были только для чтения
     date_hierarchy = 'created_date'
     ordering = ('-created_date', 'company')
+
+
+@admin.register(Invitation)
+class InvitationAdmin(admin.ModelAdmin):
+    # Отображаемые поля в списке
+    list_display = ('id', 'user', 'vacancy', 'employer', 'status', 'short_message')
+    
+    # Фильтры для быстрого поиска
+    list_filter = ('status', 'employer')
+    
+    # Поиск по определенным полям
+    search_fields = ('user__email', 'vacancy__name', 'employer__name')
+    
+    # Сортировка по умолчанию
+    ordering = ('-id',)
+    
+    # Поля для редактирования прямо в списке
+    list_editable = ('status',)
+
+    # Разделение на поля для лучшей навигации при редактировании
+    fieldsets = (
+        ('General Info', {
+            'fields': ('user', 'vacancy', 'employer', 'status')
+        }),
+        ('Message', {
+            'fields': ('message',)
+        }),
+    )
+
+    # Метод для отображения короткой версии сообщения в списке (первые 50 символов)
+    def short_message(self, obj):
+        return obj.message[:50] + '...' if len(obj.message) > 50 else obj.message
+    short_message.short_description = 'Message Preview'
+
+
+
+
 
 

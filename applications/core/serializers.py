@@ -30,52 +30,49 @@ User = get_user_model()
 class InvitationSerializer(serializers.ModelSerializer):
     user_email = serializers.EmailField(write_only=True)
     vacancy_id = serializers.PrimaryKeyRelatedField(queryset=Vacancy.objects.all(), write_only=True)
-    employer_email = serializers.EmailField(source='employer.user.email')
-
-
+    employer_email = serializers.EmailField(source='employer.user.email', write_only=True)
+    employer_name = serializers.CharField(source='employer.name', read_only=True)
+    vacancy_name = serializers.CharField(source='vacancy.name', read_only=True)
+    
     class Meta:
         model = Invitation
-        fields = ['id', 'user_email','message', 'status', 'vacancy_id', 'employer_email']
-
-    def get_vacancy(self, obj):
-        return obj.vacancy.id
+        fields = ['id', 'user_email', 'message', 'status', 'vacancy_id', 'employer_email', 'employer_name', 'vacancy_name']
 
     def create(self, validated_data):
-
         user_email = validated_data.pop('user_email')
         employer_email = validated_data.pop('employer').get('user').get('email')
         employer = EmployerCompany.objects.get(user__email=employer_email)
-        vacancy_id = validated_data.pop('vacancy_id').id  # Получаем ID вакансии
-        status = validated_data.get('status')
+        vacancy_id = validated_data.pop('vacancy_id').id
 
-        # Получаем пользователя-студента по Email
         try:
             user = User.objects.get(email=user_email, is_student=True, is_active=True)
         except User.DoesNotExist:
             raise serializers.ValidationError("Student not found")
 
-
-        # Получаем вакансию по ее ID
         try:
             vacancy = Vacancy.objects.get(id=vacancy_id)
         except Vacancy.DoesNotExist:
             raise serializers.ValidationError("Vacancy not found")
 
-        # Создаем приглашение, связанное с этими пользователями и вакансией
-        invitation = Invitation.objects.create(
-            user=user,
-            vacancy=vacancy,
-            employer=employer,
-            **validated_data
-        )
+        status = validated_data.get('status')
+        invitation = Invitation.objects.create(user=user, vacancy=vacancy, employer=employer, **validated_data)
 
         # Генерируем сообщение в зависимости от статуса
         if status == 'accepted':
-            message = f'Уважаемый {user.email}, приглашаем вас на собеседование в нашей компании {vacancy.name}'
+            message = (f'Уважаемый(ая) {user.email}, '
+                    f'мы внимательно изучили ваше резюме и были впечатлены вашими достижениями и опытом. '
+                    f'С удовольствием приглашаем вас на собеседование в компанию {employer.name} '
+                    f'на вакансию {vacancy.name}. Мы с нетерпением ожидаем встречи с вами и обсуждения деталей вашего возможного присоединения к нашей команде.')
         elif status == 'declined':
-            message = f'Уважаемый {user.email}, ваше приглашение на собеседование в компанию {vacancy.name} было отклонено'
+            message = (f'Уважаемый(ая) {user.email}, '
+                    f'благодарим вас за проявленный интерес к вакансии {vacancy.name} в компании {employer.name}. '
+                    f'После тщательного рассмотрения ряда кандидатур, к сожалению, мы приняли решение '
+                    f'продолжить поиск. Это решение никак не отражает вашей квалификации, и мы надеемся на возможность сотрудничества в будущем. '
+                    f'Желаем вам успехов и быстро найти подходящую позицию.')
         else:
-            message = f'Уважаемый {user.email}, вы получили приглашение на собеседование в компанию {vacancy.name}'
+            message = (f'Уважаемый(ая) {user.email}, '
+                    f'рады сообщить вам, что вы были отобраны на рассмотрение для вакансии {vacancy.name} в компании {employer.name}. '
+                    f'Пожалуйста, дайте нам знать о вашей готовности пройти собеседование и продолжить этот важный процесс.')
 
         invitation.message = message
         invitation.save()

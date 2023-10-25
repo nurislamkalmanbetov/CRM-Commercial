@@ -194,12 +194,6 @@ class InvitationUpdateView(generics.UpdateAPIView):
 
 
 
-
-
-
-
-
-
 class NewVacancyView(ListAPIView):
     serializer_class = VacancySerializers
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]

@@ -1256,3 +1256,29 @@ def create_characteristics_history(sender, instance, created, **kwargs):
                     date=instance.action_time,
                     changes=profile.characteristics
                 )
+
+from django.utils import timezone
+
+
+class ConnectionRequest(models.Model):
+    full_name = models.CharField("ФИО", max_length=255, blank=True, null=True)
+    email = models.EmailField("Емайл", unique=True)
+    phone = models.CharField("Номер телефона", max_length=50)
+    request_date = models.DateTimeField("Дата заявки", default=timezone.now)
+    manager_notes = models.TextField("Примечание менеджера", blank=True, null=True)
+    call_date = models.DateField("Дата звонка менеджера", blank=True, null=True)
+    text = models.TextField("Комментарий", blank=True, null=True)
+    called = models.BooleanField("Позвонил", default=False)
+    consulted = models.BooleanField("Проконсультирован", default=False)
+    call_later = models.BooleanField("Набрать позже", default=False)
+    processed = models.BooleanField("Обработан", default=False)
+    paid = models.BooleanField("Оплачен", default=False)
+
+    def __str__(self):
+        return self.email
+
+    class Meta:
+        verbose_name = 'Заявка на подключение'
+        verbose_name_plural = 'Заявки на подключение'
+
+

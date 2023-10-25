@@ -1,6 +1,6 @@
 from django.contrib.auth import authenticate, get_user_model
 from django.core.mail import send_mail
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
 from django.utils import timezone
 from django_filters.rest_framework import DjangoFilterBackend
 from django.template.loader import render_to_string
@@ -22,6 +22,9 @@ from .models import Profile
 from .serializers import *
 from .serializers import UserLoginSerializer
 import uuid
+from django.http import FileResponse
+from .models import Profile
+
 
 User = get_user_model()
 
@@ -63,8 +66,6 @@ class UserLoginView(generics.CreateAPIView):
 
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
-
-# _ 
 
 
 class PasswordResetRequestView(CreateAPIView):
@@ -261,14 +262,15 @@ class AnnouncementViewSet(viewsets.ModelViewSet):
     serializer_class = AnnouncementSerializer
 
 
-from django.http import FileResponse
-from .models import Profile
-from .pdf_utils import generate_profile_pdf
+class ConnectionRequestListCreateView(generics.ListCreateAPIView):
+    queryset = ConnectionRequest.objects.all()
+    serializer_class = ConnectionRequestSerializer
 
-def generate_profile_pdf_view(request, pk):
-    profile = Profile.objects.get(pk=pk)
-    buffer = generate_profile_pdf(profile)
-    
-    return FileResponse(buffer, as_attachment=True, filename=f'profile_{profile.id}.pdf')
+    def post(self, request, *args, **kwargs):
+        """Создание новой заявки на подключение"""
+        return self.create(request, *args, **kwargs)
+
+
+
 
 

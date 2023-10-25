@@ -217,6 +217,10 @@ class Invitation(models.Model):
 
     def __str__(self):
         return f"{self.user} - {self.vacancy}"
+    
+    class Meta:
+        verbose_name = 'Принлашение на вакансию'
+        verbose_name_plural = 'ОПриглашения на вакансии'
 
 
 class CompanyReview(models.Model):
@@ -241,10 +245,6 @@ class CompanyReview(models.Model):
     class Meta:
         verbose_name = 'Отзыв о компании'
         verbose_name_plural = 'Отзывы о компаниях'
-
-
-
-
 
 
 

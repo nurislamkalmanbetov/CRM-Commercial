@@ -3,6 +3,7 @@ from django.dispatch import receiver
 from .models import Vacancy
 from django.conf import settings
 from django.core.mail import send_mail
+from .models import ReviewVacancy
 
 
 
@@ -41,3 +42,24 @@ def send_vacancy_notification(sender, instance, created, **kwargs):
         for user in users:
             to_email = user.email
             send_mail(subject, message, from_email, [to_email])
+
+
+
+@receiver(post_save, sender=ReviewVacancy)
+def send_email_notification(sender, instance, created, **kwargs):
+    if created:
+        return
+
+    subject = 'Статус вашего отклика на вакансию обновлен'
+    
+    if instance.employer_comment:
+        comment = f"\n\nКомментарий от работодателя: {instance.employer_comment}"
+    else:
+        comment = ""
+
+    message = f'Отклик на вакансию "{instance.vacancy.name}" обновлен до статуса "{instance.status}".' + comment
+    recipient_list = [instance.applicant_profile.user.email]  # Email соискателя
+
+    send_mail(subject, message, recipient_list)
+
+

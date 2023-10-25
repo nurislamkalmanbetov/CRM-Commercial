@@ -34,9 +34,10 @@ urlpatterns = [
     # forgot password
     path('a-password_reset/', PasswordResetRequestView.as_view(), name='password-reset-request'),
     path('a-password_reset_confirm/<str:token>/', PasswordResetConfirmView.as_view(), name='password-reset-confirm'),
-
-    path('export-pdf/<int:pk>/', generate_profile_pdf_view, name='export_pdf'),
-
+    
+    # conetction request
+    path('connection-requests/', ConnectionRequestListCreateView.as_view(), name='connection-requests-list-create'),
+    # path('connection-requests/<int:pk>/', ConnectionRequestDetailView.as_view(), name='connection_request_detail'),
 ]
 
 

@@ -69,5 +69,3 @@ def send_password_email(sender, instance, created, **kwargs):
             send_mail(subject, message, from_email, recipient_list, fail_silently=False)
         except Exception as e:
             pass
-
-        

@@ -36,6 +36,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 class PasswordResetRequestSerializer(serializers.Serializer):
     email = serializers.EmailField()
 
+
 class PasswordResetConfirmSerializer(serializers.Serializer):
     token = serializers.CharField()
     password = serializers.CharField(write_only=True)
@@ -175,4 +176,17 @@ class AnnouncementSerializer(serializers.ModelSerializer):
     class Meta:
         model = Announcement
         fields = '__all__'
+
+
+class UserConnectionRequestSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('full_name', 'email', 'phone', 'is_employer', 'is_student')
+
+
+class ConnectionRequestSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ConnectionRequest
+        fields = ('id', 'full_name', 'email', 'phone', 'request_date', 'manager_notes', 'call_date', 'called', 'consulted', 'call_later')
+
 
