@@ -16,6 +16,7 @@ CHOICES = (
 )
 
 
+
 class CustomCharField(forms.CharField):
     def validate(self, value):
         pass

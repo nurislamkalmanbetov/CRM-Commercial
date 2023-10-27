@@ -48,9 +48,6 @@ ALLOWED_HOSTS = ['*']
 INSTALLED_APPS = [
     'smart_selects',
     'rangefilter',
-    # 'applications.apps.SuitConfig',
-    # 'applications.apps.JazzminConfig',
-
     'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -62,6 +59,7 @@ INSTALLED_APPS = [
     'storages',
     'applications.accounts',
     'applications.core',
+    'applications.bot',
     'applications.common',
     'drf_yasg2',
     'rest_framework',
@@ -122,17 +120,26 @@ WSGI_APPLICATION = 'iwex_crm.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': env('POSTGRES_DB'),
+#         'USER': env('POSTGRES_USER'),
+#         'PASSWORD':  env('POSTGRES_PASSWORD'),
+#         'HOST': env('POSTGRES_HOST'),
+#         'PORT': env('POSTGRES_PORT'),
+#     }
+# }
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': env('POSTGRES_DB'),
-        'USER': env('POSTGRES_USER'),
-        'PASSWORD':  env('POSTGRES_PASSWORD'),
-        'HOST': env('POSTGRES_HOST'),
-        'PORT': env('POSTGRES_PORT'),
+        'NAME': 'crm4',
+        'USER': 'postgres',
+        'PASSWORD':  '123',
+        'HOST': 'localhost',
+        'PORT': 5432,
     }
 }
-
 
 
 # Password validation

@@ -83,6 +83,7 @@ class ContractAdmin(models.Model):
 
 
 
+
 class EmployerCompany(models.Model):
     icon = models.ImageField(upload_to='company_icons/', blank=True, verbose_name='Изображение')
     user = models.ForeignKey('accounts.User', on_delete=models.CASCADE, verbose_name='Работодатель')
@@ -277,3 +278,7 @@ class ImprovementIdea(models.Model):
 
 
 
+class Event(models.Model):
+    title = models.CharField(max_length=200)
+    start = models.DateTimeField()
+    end = models.DateTimeField()

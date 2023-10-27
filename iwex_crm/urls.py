@@ -62,10 +62,12 @@ schema_view = get_schema_view(
 urlpatterns = [
 #     path("i18n/", include("django.conf.urls.i18n")),
     path('admin/', admin.site.urls),
+    
     path('i18n/', set_language, name='set_language'),
     path('chaining/', include('smart_selects.urls')),
     path('accounts/', include('applications.accounts.urls')),
     path('core/', include('applications.core.urls')),
+    path('bot/', include('applications.bot.urls')),
     path('', main_page, name='main-page'),
     path('reset/', auth_views.PasswordResetView.as_view(), name='reset-password-page'),
     path('reset/done/', auth_views.PasswordResetDoneView.as_view(), name='password_reset_done'),

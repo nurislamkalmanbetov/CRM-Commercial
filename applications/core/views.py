@@ -292,3 +292,12 @@ class ModeratedFeedbackListView(generics.ListAPIView):
 
     def get_queryset(self):
         return Feedback.objects.filter(status='moderated')
+
+
+from django.http import JsonResponse
+from .models import Event
+
+from django.shortcuts import render
+
+def events_calendar(request):
+    return render(request, "admin/events_calendar.html")

@@ -27,6 +27,8 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from model_utils import FieldTracker
 from smart_selects.db_fields import ChainedForeignKey
+from django.utils.html import format_html, format_html_join
+
 
 
 class User(AbstractBaseUser, PermissionsMixin):
@@ -936,6 +938,11 @@ class Profile(models.Model):
                        'Ошская область': 'Osh Region',
                        'Баткенская область': 'Batken Region', }
         return region_dict.get(region_ru)
+    def image_tag(self):
+        if self.photo:
+            return format_html('<img src="{}" width="350" height="350" />', self.photo.url)
+        return "Нет изображения"
+    image_tag.short_description = 'Превью'
 
     class Meta:
         ordering = ['last_name', 'first_name', '-creation_date']

@@ -1,0 +1,24 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block extrahead %}
+<link href='https://fullcalendar.io/releases/fullcalendar/5.10.0/main.css' rel='stylesheet' />
+<script src='https://fullcalendar.io/releases/fullcalendar/5.10.0/main.js'></script>
+{% endblock %}
+
+{% block content %}
+<div id='calendar'></div>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var calendarEl = document.getElementById('calendar');
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            events: '{% url "get_events" %}',
+            dateClick: function(info) {
+                // Здесь можно добавить логику для добавления событий через клик на дату
+            }
+        });
+        calendar.render();
+    });
+</script>
+{% endblock %}

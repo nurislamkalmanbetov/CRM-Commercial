@@ -86,3 +86,8 @@ class ImprovementIdeaAdmin(admin.ModelAdmin):
     list_display = ('text', 'user', 'created_at', 'status')
     list_filter = ('status',)
     search_fields = ('text',)
+
+
+@admin.register(Event)
+class EventAdmin(admin.ModelAdmin):
+    change_form_template = "admin/events_calendar.html"

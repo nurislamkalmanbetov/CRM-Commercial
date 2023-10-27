@@ -133,7 +133,7 @@ class ProfileAdmin(admin.ModelAdmin):
         'reading', 'singing', 'travelling', 'yoga', 'dancing', 'sport', 'drawing', 'computer_games', 'guitar', 'films', 'music', 'knitting', 'cooking', 'fishing', 'photographing', 
         )
     fieldsets = (
-        (None, {'fields': ('user', 'photo', 'first_name', 'last_name', 'telephone',
+        (None, {'fields': ('user', 'photo','image_tag', 'first_name', 'last_name', 'telephone',
         'bday', 'gender','been_to_germany', 'nationality', 'birth_country','reg_apartment',
         'university','faculty','study_start','study_end','direction',
         'german', 'english', 'turkish', 'russian', 'chinese', 
@@ -153,6 +153,8 @@ class ProfileAdmin(admin.ModelAdmin):
         ),
         }),
     )
+    readonly_fields = ['image_tag']
+   
 
 class ProfileInContactDetailsAdmin(admin.ModelAdmin):
     list_display = ['id', 'get_user_email', 'get_user_phone', 'get_user_whatsapp_phone', 'get_father_phone', 'get_mother_phone']

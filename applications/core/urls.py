@@ -21,6 +21,7 @@ urlpatterns = [
     path('review-patch/<int:pk>/', ReviewVacancyUpdateView.as_view(), name='review-patch'),
 
     path('feedback-get', ModeratedFeedbackListView.as_view(), name='feedback-get'),
+    path('admin/events_calendar/', events_calendar, name='events_calendar'),
 
     # path('university/', UniversityView.as_view(), name='university'),
     # path('faculty/', FacultyView.as_view(), name='faculty'),
