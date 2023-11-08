@@ -38,6 +38,15 @@ urlpatterns = [
     # conetction request
     path('connection-requests/', ConnectionRequestListCreateView.as_view(), name='connection-requests-list-create'),
     # path('connection-requests/<int:pk>/', ConnectionRequestDetailView.as_view(), name='connection_request_detail'),
+
+
+
+
+
+
+
+
+    path('login/', user_login, name='login'),
 ]
 
 

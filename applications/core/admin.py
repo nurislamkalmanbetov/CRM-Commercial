@@ -30,13 +30,11 @@ class ContractAdmin(admin.ModelAdmin):
 
 @admin.register(EmployerCompany)
 class EmployerCompanyAdmin(admin.ModelAdmin):
-    fields = ['user', 'name', 'country']
+    fields = ['background_picture', 'icon', 'user', 'name', 'country', 'description']
 
-    list_display = ['id', 'name', 'user', 'country', ]
+    list_display = ['id', 'name', 'user', 'country',]
 
-    search_fields = ['name']
-
-    inlines = [VacancyInline]
+    search_fields = ['name', ]
 
 
 @admin.register(Vacancy)

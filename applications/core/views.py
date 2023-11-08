@@ -240,6 +240,41 @@ class CompanyReviewView(generics.CreateAPIView):
         return self.create(request, *args, **kwargs)
 
 
+
+
+class EmployerListApiView(ListAPIView):
+    serializer_class = EmployerCompanySerialzers
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['user__email']
+
+    def get_queryset(self):
+        return EmployerCompany.objects.all()
+    
+
+
+class EmployerCompanyView(generics.CreateAPIView):
+    serializer_class = EmployerCompanySerialzers
+    queryset = EmployerCompany.objects.all()
+    parser_classes = (MultiPartParser, FormParser)
+
+
+    def perform_create(self, serializer):
+        user_data = self.request.data.get('user')
+        try:
+            user = User.objects.get(email=user_data)
+        except User.DoesNotExist:
+            raise serializers.ValidationError({'detail': 'User not found.'})
+
+        if not user.is_employer:
+            raise serializers.ValidationError({'detail': 'You are not an employer.'})
+        serializer.save(user=user)
+
+
+    def post(self, request, *args, **kwargs):
+        return self.create(request, *args, **kwargs)
+
+
+
 class EmployerCompanyMixins(mixins.RetrieveModelMixin,
                         mixins.UpdateModelMixin,
                         mixins.DestroyModelMixin, GenericAPIView):
@@ -261,10 +296,11 @@ class EmployerCompanyMixins(mixins.RetrieveModelMixin,
         return response
 
 
-class EmployerListApiView(ListAPIView):
-    serializer_class = EmployerCompanySerialzers
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['user__email']
 
-    def get_queryset(self):
-        return EmployerCompany.objects.all()
+# _ 
+from django.shortcuts import render, get_object_or_404
+
+
+def employer_company_detail(request, company_id):
+    company = get_object_or_404(EmployerCompany, pk=company_id)
+    return render(request, 'employer_company.html', {'company': company})

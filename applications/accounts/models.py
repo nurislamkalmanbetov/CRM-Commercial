@@ -1106,14 +1106,6 @@ class ProfileNotConfirmed(Profile):
         verbose_name_plural = 'Общий список'
 
 
-# class ProfileInRegistration(Profile):
-#     objects = ProfileInRegistrationManager()
-
-#     class Meta:
-#         proxy = True
-#         verbose_name = 'На регистрации'
-#         verbose_name_plural = 'На регистрации'
-
 
 class ProfileInEssentialInfo(Profile):
     objects = ProfileEssentialInfoManager()

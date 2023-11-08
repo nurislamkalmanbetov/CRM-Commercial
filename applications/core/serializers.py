@@ -6,22 +6,40 @@ from asgiref.sync import async_to_sync
 from applications.accounts.models import Profile
 
 class EmployerCompanySerialzers(serializers.ModelSerializer):
-    user = serializers.EmailField(source='user.email')
+    user = serializers.EmailField(source='user.email', required=False)
+    name = serializers.CharField(required=False)
 
     class Meta:
         model = EmployerCompany
         fields = [
             'id',
             'user',
+            'background_picture',
+            'icon',
             'name',
-            'country'
+            'country',
+            'description',
         ]
 
     def create(self, validated_data):
-        user_email = validated_data.pop('user').get('email')
+        user_email = validated_data.pop('user', None)  # Обратите внимание на изменение 'user.email' на 'user'
         user = User.objects.get(email=user_email)
-        employercompany = EmployerCompany.objects.create(user=user, **validated_data)  # Используем **validated_data
+        employercompany = EmployerCompany.objects.create(user=user, **validated_data)
         return employercompany
+
+    def update(self, instance, validated_data):
+        user_email = validated_data.pop('user', None)  # Извлекаем email, если он передан
+
+        if user_email:  # Если email был передан, обновляем пользователя
+            user = User.objects.get(email=user_email)
+            instance.user = user
+
+        # Обновление остальных полей
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+
+        instance.save()  # Сохраняем изменения
+        return instance
 
 
 User = get_user_model()

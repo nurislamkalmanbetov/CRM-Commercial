@@ -274,3 +274,22 @@ class ConnectionRequestListCreateView(generics.ListCreateAPIView):
 
 
 
+# ___
+
+from django.shortcuts import render, redirect
+from django.contrib.auth import authenticate, login
+from django.contrib import messages
+from .serializers import UserLoginSerializer
+
+def user_login(request):
+    if request.method == "POST":
+        serializer = UserLoginSerializer(data=request.POST)
+        if serializer.is_valid():
+            user = authenticate(email=serializer.validated_data['email'], password=serializer.validated_data['password'])
+            if user is not None:
+                login(request, user)
+                # Если у вас есть редирект после входа, измените его здесь
+                return redirect('common:home')
+            else:
+                messages.error(request, 'Неверный логин или пароль')
+    return render(request, 'accounts/login.html')

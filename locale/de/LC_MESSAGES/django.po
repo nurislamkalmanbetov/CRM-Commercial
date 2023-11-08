@@ -1,0 +1,967 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: de\n"
+
+msgid "университет"
+msgstr "Universität"
+
+msgid "университеты"
+msgstr "Universitäten"
+
+msgid "Название на русском"
+msgstr "Name auf Russisch"
+
+msgid "Название на немецком"
+msgstr "Name auf Deutsch"
+
+msgid "Адрес на немецком"
+msgstr "Adresse auf Deutsch"
+
+msgid "Номер телефона"
+msgstr "Telefonnummer"
+
+msgid "Сайт университета"
+msgstr "Universitätswebsite"
+
+
+
+msgid "факультет"
+msgstr "Fakultät"
+
+msgid "факультеты"
+msgstr "Fakultäten"
+
+
+
+msgid "уведомление"
+msgstr "Benachrichtigung"
+
+msgid "уведомления"
+msgstr "Benachrichtigungen"
+
+msgid "Пользователь"
+msgstr "Benutzer"
+
+msgid "Автор"
+msgstr "Autor"
+
+msgid "Заголовок"
+msgstr "Titel"
+
+msgid "Сообщение"
+msgstr "Nachricht"
+
+msgid "Время отправки"
+msgstr "Versandzeit"
+
+msgid "Просмотрено"
+msgstr "Gesehen"
+
+
+
+msgid "Администратор для контрактов"
+msgstr "Administrator für Verträge"
+
+msgid "Администраторы для контрактов"
+msgstr "Administratoren für Verträge"
+
+msgid "Имя"
+msgstr "Vorname"
+
+msgid "Фамилия"
+msgstr "Nachname"
+
+msgid "Отчество"
+msgstr "Mittlerer Name"
+
+msgid "Пол"
+msgstr "Geschlecht"
+
+msgid "Мужской"
+msgstr "Männlich"
+
+msgid "Женский"
+msgstr "Weiblich"
+
+msgid "Номер патента (N1234567)"
+msgstr "Patentnummer (N1234567)"
+
+msgid "Дата получения патента"
+msgstr "Patentausstellungsdatum"
+
+msgid "Выдан (УГНС по Ленинскому району)"
+msgstr "Ausgestellt von (UFS im Leninsky-Bezirk)"
+
+
+
+msgid "Работодатель"
+msgstr "Arbeitgeber"
+
+msgid "Работодатели"
+msgstr "Arbeitgeber"
+
+msgid "Фон"
+msgstr "Hintergrundbild"
+
+msgid "Название"
+msgstr "Bezeichnung"
+
+msgid "страна"
+msgstr "Land"
+
+msgid "Описание"
+msgstr "Beschreibung"
+
+
+
+msgid "Вакансия"
+msgstr "Stelle"
+msgid "Вакансии"
+msgstr "Stellen"
+
+msgid "Язык"
+msgstr "Sprache"
+
+msgid "Уровень владения"
+msgstr "Beherrschungsgrad"
+
+msgid "Требуемое количество мест"
+msgstr "Erforderliche Anzahl an Stellen"
+
+msgid "Колличество одобренных вакансии"
+msgstr "Anzahl genehmigter Stellen"
+
+msgid "Название вакансии"
+msgstr "Stellenbezeichnung"
+
+msgid "Зарплата"
+msgstr "Gehalt"
+
+msgid "Обязанности работника"
+msgstr "Mitarbeiterpflichten"
+
+msgid "Город"
+msgstr "Stadt"
+
+msgid "Жилье"
+msgstr "Unterkunft"
+
+msgid "Стоимость жилья"
+msgstr "Unterkunftskosten"
+
+msgid "Прошел на вакансию"
+msgstr "Hat die Stelle bestanden"
+
+msgid "Страховка"
+msgstr "Versicherung"
+
+msgid "Транспорт"
+msgstr "Verkehrsmittel"
+
+msgid "Контактные данные"
+msgstr "Kontaktdaten"
+
+msgid "Пункт назначения"
+msgstr "Zielort"
+
+msgid "Требования работодателя"
+msgstr "Arbeitgeberanforderungen"
+
+msgid "Доп. информация"
+msgstr "Zusätzliche Informationen"
+
+msgid "Дата публикации"
+msgstr "Veröffentlichungsdatum"
+
+
+
+msgid "Отклик на вакансию"
+msgstr "Bewerbung auf eine Stelle"
+
+msgid "Отклики на вакансии"
+msgstr "Bewerbungen auf Stellen"
+
+msgid "Статус отклика"
+msgstr "Bewerbungsstatus"
+
+msgid "На рассмотрении"
+msgstr "In Bearbeitung"
+
+msgid "Одобрено"
+msgstr "Genehmigt"
+
+msgid "Отказано"
+msgstr "Abgelehnt"
+
+msgid "Профиль соискателя"
+msgstr "Bewerberprofil"
+
+msgid "Комментарий работодателя"
+msgstr "Kommentar des Arbeitgebers"
+
+
+
+msgid "Приглашение на вакансию"
+msgstr "Einladung zur Stelle"
+
+msgid "Приглашения на вакансии"
+msgstr "Einladungen zu Stellen"
+
+msgid "Ожидает ответа"
+msgstr "Wartet auf Antwort"
+
+msgid "Принято"
+msgstr "Akzeptiert"
+
+msgid "Отклонено"
+msgstr "Abgelehnt"
+
+
+
+
+
+
+
+
+msgid "Отзыв о компании"
+msgstr "Rückblick auf das Unternehmen"
+
+msgid "Отзывы о компаниях"
+msgstr "Bewertungen von Unternehmen"
+
+msgid "Компания"
+msgstr "Firma"
+
+msgid "Рейтинг"
+msgstr "Reiting"
+
+msgid "Комментарий"
+msgstr "Ein Kommentar"
+
+msgid "Прошел модерацию"
+msgstr "Moderation bestanden"
+
+
+
+msgid "Количество зарегистрированных пользователей"
+msgstr "Anzahl registrierter Benutzer"
+
+msgid "Дата"
+msgstr "Datum"
+
+
+
+msgid "Тариф"
+msgstr "Tarif"
+
+msgid "Тарифы"
+msgstr "Tarife"
+
+msgid "Сумма цифрами"
+msgstr "Summe in Ziffern"
+
+msgid "Сумма буквами"
+msgstr "Summe in Buchstaben"
+
+msgid "Вариант тарифа"
+msgstr "Tarifoption"
+
+
+
+msgid "Отзыв"
+msgstr "Rezension"
+
+msgid "Отзывы"
+msgstr "Rezensionen" 
+
+
+
+msgid "Email адрес"
+msgstr "E-Mail-Adresse"
+
+
+
+msgid "Работадатель"
+msgstr "Arbeitgeber"
+
+msgid "Сотрудник"
+msgstr "Mitarbeiter"
+
+msgid "Студент"
+msgstr "Student"
+
+msgid "Суперпользователь"
+msgstr "Superuser"
+
+msgid "Активен"
+msgstr "Aktiv"
+
+msgid "Удален"
+msgstr "Gelöscht"
+
+msgid "Дата регистрации"
+msgstr "Registrationsdatum"
+
+msgid "Время начала работы"
+msgstr "Startzeit"
+
+msgid "Номер Whatsapp"
+msgstr "WhatsApp-Nummer"
+
+msgid "Оплату принял"
+msgstr "Zahlung erhalten"
+
+msgid "Оплачено"
+msgstr "Bezahlt"
+
+msgid "Остаток"
+msgstr "Restbetrag"
+
+msgid "Оплачено полностью"
+msgstr "Vollständig bezahlt"
+
+msgid "Дата оплаты"
+msgstr "Zahlungsdatum"
+
+msgid "Крайний срок оплаты"
+msgstr "Fälligkeitsdatum"
+
+msgid "Платеж студента"
+msgstr "Zahlung des Studenten"
+
+msgid "Платежи студентов"
+msgstr "Zahlungen der Studenten"
+
+msgid "сотрудники"
+msgstr "Mitarbeiter"
+
+msgid "Кыргызстан"
+msgstr "Kirgisistan"
+
+msgid "Казахстан"
+msgstr "Kasachstan"
+
+msgid "Узбекистан"
+msgstr "Usbekistan"
+
+msgid "Таджикистан"
+msgstr "Tadschikistan"
+
+msgid "Россия"
+msgstr "Russland"
+
+msgid "другое"
+msgstr "Sonstiges"
+
+msgid "Турция"
+msgstr "Türkei"
+
+msgid "Чуйская область"
+msgstr "Tschü-Region"
+
+msgid "Нарынская область"
+msgstr "Naryn-Region"
+
+msgid "Таласская область"
+msgstr "Talas-Region"
+
+msgid "Ыссык-Кульская область"
+msgstr "Yssykköl-Region"
+
+msgid "Жалал-Абадская область"
+msgstr "Dschalal-Abad-Region"
+
+msgid "Ошская область"
+msgstr "Osch-Region"
+
+msgid "Баткенская область"
+msgstr "Batken-Region"
+
+msgid "Бакалавр"
+msgstr "Bachelor"
+
+msgid "Магистр"
+msgstr "Master"
+
+msgid "Колледж"
+msgstr "Hochschule"
+
+msgid "Официант"
+msgstr "Kellner"
+
+msgid "Кассир"
+msgstr "Kassierer"
+
+msgid "Кух. работник"
+msgstr "Küchenpersonal"
+
+msgid "Горничная"
+msgstr "Zimmermädchen"
+
+msgid "Ресепшн"
+msgstr "Rezeption"
+
+msgid "Грузчик"
+msgstr "Lader"
+
+msgid "Таксист"
+msgstr "Taxifahrer"
+
+msgid "Преподаватель"
+msgstr "Lehrer"
+
+msgid "Няня"
+msgstr "Nanny"
+
+msgid "Курьер"
+msgstr "Kurier"
+
+msgid "Секретарь"
+msgstr "Sekretär"
+
+msgid "Работа на полях"
+msgstr "Feldarbeit"
+
+msgid "Оператор call-центра"
+msgstr "Call-Center-Agent"
+
+msgid "Охранник"
+msgstr "Sicherheitsmann"
+
+msgid "Промоутер"
+msgstr "Promoter"
+
+msgid "Бармен"
+msgstr "Barkeeper"
+
+msgid "Гид"
+msgstr "Reiseleiter"
+
+msgid "Аниматор"
+msgstr "Animator"
+
+msgid "Заправщик"
+msgstr "Tankwart"
+
+msgid "Администратор"
+msgstr "Administrator"
+
+msgid "Упаковщик"
+msgstr "Verpacker"
+
+msgid "Работа в швейном цеху"
+msgstr "Arbeit in der Näherei"
+
+msgid "Уборщица"
+msgstr "Reinigungskraft"
+
+msgid "Пастух"
+msgstr "Hirte"
+
+msgid "Работа на фермах"
+msgstr "Arbeit auf Farmen"
+
+msgid "Санитар"
+msgstr "Sanitäter"
+
+msgid "Строитель"
+msgstr "Bauarbeiter"
+
+msgid "Визажист"
+msgstr "Visagist"
+
+msgid "Дизайнер"
+msgstr "Designer"
+
+msgid "Домохозяйка"
+msgstr "Hausfrau"
+
+msgid "Кладовщик"
+msgstr "Lagerarbeiter"
+
+msgid "Маркетолог"
+msgstr "Marketingfachmann"
+
+msgid "Массажист"
+msgstr "Masseur"
+
+msgid "Мебельщик"
+msgstr "Möbeltischler"
+
+msgid "Медбрат"
+msgstr "Pflegebruder"
+
+msgid "Медсестра"
+msgstr "Krankenschwester"
+
+msgid "Мэнеджер"
+msgstr "Manager"
+
+msgid "Монтёр"
+msgstr "Monteur"
+
+msgid "Оператор"
+msgstr "Operator"
+
+msgid "Отделочник"
+msgstr "Finisher"
+
+msgid "Парикмахер"
+msgstr "Friseur"
+
+msgid "Переводчик"
+msgstr "Übersetzer"
+
+msgid "Повар"
+msgstr "Koch"
+
+msgid "Посудомойщик"
+msgstr "Spüler"
+
+msgid "Почтальон"
+msgstr "Briefträger"
+
+msgid "Прачка"
+msgstr "Wäscherin"
+
+msgid "Работа на складах"
+msgstr "Arbeit in Lagern"
+
+msgid "Разнорабочий"
+msgstr "Allrounder"
+
+msgid "Сантехник"
+msgstr "Installateur"
+
+msgid "Сварщик"
+msgstr "Schweißer"
+
+msgid "Сиделка"
+msgstr "Betreuerin"
+
+msgid "Торговый агент"
+msgstr "Handelsvertreter"
+
+msgid "Тренер"
+msgstr "Trainer"
+
+msgid "Уборщик"
+msgstr "Reinigungskraft"
+
+msgid "Фотограф"
+msgstr "Fotograf"
+
+msgid "Хореограф"
+msgstr "Choreograf"
+
+msgid "Электрик"
+msgstr "Elektriker"
+
+msgid "Германия"
+msgstr "Deutschland"
+
+msgid "Дубай"
+msgstr "Dubai"
+
+msgid "Америка"
+msgstr "Amerika"
+
+msgid "В совершенстве"
+msgstr "Perfekt"
+
+msgid "Очень хорошо"
+msgstr "Sehr gut"
+
+msgid "Хорошо"
+msgstr "Gut"
+
+msgid "Разговорный"
+msgstr "Konversationell"
+
+msgid "Обучаюсь"
+msgstr "Lerne"
+
+msgid "Начальный"
+msgstr "Anfänger"
+
+msgid "Не знаю"
+msgstr "Ich weiß nicht"
+
+msgid "до 1 года"
+msgstr "Weniger als 1 Jahr"
+
+msgid "1 год"
+msgstr "1 Jahr"
+
+msgid "2 года"
+msgstr "2 Jahre"
+
+msgid "3 года"
+msgstr "3 Jahre"
+
+msgid "4 и более лет"
+msgstr "4 Jahre und mehr"
+
+msgid "Механика"
+msgstr "Manuell"
+
+msgid "Автомат"
+msgstr "Automatisch"
+
+msgid "Механика и автомат"
+msgstr "Manuell und Automatisch"
+
+msgid "Да, отлично"
+msgstr "Ja, ausgezeichnet"
+
+msgid "Да, но плохо"
+msgstr "Ja, aber nicht gut"
+
+msgid "Нет, не умею"
+msgstr "Nein, ich kann es nicht"
+
+msgid "Посольство"
+msgstr "Botschaft"
+
+msgid "Визаметрик"
+msgstr "Visumetric"
+
+msgid "Нет маршрута"
+msgstr "Keine Route"
+
+
+msgid "Маршрут был составлен"
+msgstr "Die Route wurde erstellt"
+
+msgid "Маршрут был получен"
+msgstr "Die Route wurde erhalten"
+
+msgid "Нет"
+msgstr "Nein"
+
+msgid "Принес"
+msgstr "Gebracht"
+
+msgid "Отправили в Германию"
+msgstr "Nach Deutschland geschickt"
+
+msgid "Не дали"
+msgstr "Nicht gegeben"
+
+msgid "Не смог получить (сомнительно)"
+msgstr "Konnte nicht erhalten (zweifelhaft)"
+
+
+
+msgid "Подтвержден пользователем"
+msgstr "Vom Benutzer bestätigt"
+
+msgid "Статус заполнения формы"
+msgstr "Status des Formulars"
+
+msgid "Подтверждено админом"
+msgstr "Vom Administrator bestätigt"
+
+msgid "Доступ к справкам для регистрации"
+msgstr "Zugang zu Registrierungszertifikaten"
+
+msgid "Доступ к справкам для посольства"
+msgstr "Zugang zu Botschaftszertifikaten"
+
+msgid "Дата начала действия визы"
+msgstr "Visum Gültigkeitsdatum"
+
+msgid "Дата окончания действия визы"
+msgstr "Visum Ablaufdatum"
+
+msgid "Уровень"
+msgstr "Niveau"
+
+msgid "Курсы"
+msgstr "Kurse"
+
+
+
+msgid "Заметка"
+msgstr "Notiz"
+
+msgid "Имя на латинице"
+msgstr "Name in lateinischer Schrift"
+
+msgid "Имя на кириллице"
+msgstr "Name in kyrillischer Schrift"
+
+msgid "Фамилия на латинице"
+msgstr "Nachname in lateinischer Schrift"
+
+msgid "Фамилия на кириллице"
+msgstr "Nachname in kyrillischer Schrift"
+
+msgid "День рождения"
+msgstr "Geburtstag"
+
+msgid "Гражданство"
+msgstr "Staatsangehörigkeit"
+
+msgid "Был в Германии"
+msgstr "War in Deutschland"
+
+msgid "Страна рождения"
+msgstr "Geburtsland"
+
+msgid "Область рождения"
+msgstr "Gebietsgeburt"
+
+msgid "Город/cело рождения"
+msgstr "Stadt/Dorf der Geburt"
+
+msgid "Квартира (адрес прописки)"
+msgstr "Wohnung (gemeldete Adresse)"
+
+
+
+msgid "Дата поступления"
+msgstr "Eintrittsdatum"
+
+msgid "Дата окончания"
+msgstr "Ablaufdatum"
+
+msgid "Направление"
+msgstr "Richtung"
+
+msgid "Знание немецкого языка"
+msgstr "Deutschkenntnisse"
+
+msgid "Знание английского языка"
+msgstr "Englischkenntnisse"
+
+msgid "Знание турецкого языка"
+msgstr "Türkischkenntnisse"
+
+msgid "Знание русского языка"
+msgstr "Russischkenntnisse"
+
+msgid "Знание китайского языка"
+msgstr "Chinesischkenntnisse"
+
+msgid "Водительские права"
+msgstr "Führerschein"
+
+msgid "Стаж вождения"
+msgstr "Fahrerfahrung"
+
+msgid "Категория A"
+msgstr "Kategorie A"
+
+msgid "Категория B"
+msgstr "Kategorie B"
+
+msgid "Категория C"
+msgstr "Kategorie C"
+
+msgid "Категория D"
+msgstr "Kategorie D"
+
+msgid "Категория E"
+msgstr "Kategorie E"
+
+msgid "Трактор"
+msgstr "Traktor"
+
+msgid "Коробка передач"
+msgstr "Getriebeart"
+
+msgid "Чтение"
+msgstr "Lesen"
+
+msgid "Пение"
+msgstr "Singen"
+
+msgid "Путешествие"
+msgstr "Reisen"
+
+msgid "Йога"
+msgstr "Yoga"
+
+msgid "Танцы"
+msgstr "Tanz"
+
+msgid "Спорт"
+msgstr "Sport"
+
+msgid "Рисование"
+msgstr "Malen"
+
+msgid "Компьютерные игры"
+msgstr "Computerspiele"
+
+msgid "Игра на гитаре"
+msgstr "Gitarrenspiel"
+
+msgid "Фильмы"
+msgstr "Filme"
+
+msgid "Музыка"
+msgstr "Musik"
+
+msgid "Вязание"
+msgstr "Stricken"
+
+msgid "Готовка"
+msgstr "Kochen"
+
+msgid "Рыбалка"
+msgstr "Angeln"
+
+msgid "Фотография"
+msgstr "Fotografie"
+
+msgid "Профиль студента"
+msgstr "Studentenprofil"
+
+msgid "Профили студентов"
+msgstr "Studentenprofile"
+
+msgid "Контакт студента"
+msgstr "Studentenkontakt"
+
+msgid "Контакты студентов"
+msgstr "Studentenkontakte"
+
+msgid "Документ Студента"
+msgstr "Studentendokument"
+
+msgid "Документы Студентов"
+msgstr "Studentendokumente"
+
+msgid "Не оповестили"
+msgstr "Nicht benachrichtigt"
+
+msgid "Сомнительно"
+msgstr "Zweifelhaft"
+
+msgid "Оповестили"
+msgstr "Benachrichtigt"
+
+msgid "Оповестили дважды"
+msgstr "Zweimal benachrichtigt"
+
+msgid "Приглашен"
+msgstr "Eingeladen"
+
+msgid "Дата оповещения"
+msgstr "Benachrichtigungsdatum"
+
+msgid "Подтверждение студента"
+msgstr "Studentenbestätigung"
+
+
+msgid "Дата и время собеседования"
+msgstr "Datum und Uhrzeit des Interviews"
+
+msgid "Дата начала работы"
+msgstr "Arbeitsbeginndatum"
+
+msgid "Дата окончания работы"
+msgstr "Arbeitsenddatum"
+
+msgid "Собеседование"
+msgstr "Interview"
+
+msgid "Собеседования"
+msgstr "Interviews"
+
+msgid "Общий список"
+msgstr "Allgemeine Liste"
+
+msgid "Справочная информация"
+msgstr "Referenzinformation"
+
+msgid "Оплатил"
+msgstr "Bezahlt"
+
+
+msgid "Сумма оплаты"
+msgstr "Zahlungsbetrag"
+
+msgid "Время создания счета"
+msgstr "Rechnungserstellungszeit"
+
+msgid "Время изменения счета"
+msgstr "Rechnungsänderungszeit"
+
+msgid "Счет"
+msgstr "Rechnung"
+
+msgid "Счета"
+msgstr "Rechnungen"
+
+msgid "Автор изменений"
+msgstr "Änderungsautor"
+
+msgid "Дата изменений"
+msgstr "Änderungsdatum"
+
+msgid "Текст изменения"
+msgstr "Änderungstext"
+
+msgid "История изменений Характеристики"
+msgstr "Änderungshistorie des Merkmals"
+
+msgid "Тех поддержка"
+msgstr "Technischer Support"
+
+msgid "Ответ"
+msgstr "Antwort"
+
+msgid "Отправлено"
+msgstr "Gesendet"
+
+msgid "Отправить студентам"
+msgstr "An Studenten senden"
+
+msgid "Отправить работодателям"
+msgstr "An Arbeitgeber senden"
+
+msgid "Объявление"
+msgstr "Ankündigung"
+
+msgid "Объявления"
+msgstr "Ankündigungen"
+
+msgid "ФИО"
+msgstr "Name, Vorname, Nachname"
+
+msgid "Емайл"
+msgstr "E-Mail"
+
+msgid "Дата заявки"
+msgstr "Antragsdatum"
+
+msgid "Примечание менеджера"
+msgstr "Managerkommentar"
+
+msgid "Дата звонка менеджера"
+msgstr "Anrufdatum des Managers"
+
+
+
+msgid "Позвонил"
+msgstr "Angerufen"
+
+msgid "Проконсультирован"
+msgstr "Beraten"
+
+msgid "Набрать позже"
+msgstr "Später anrufen"
+
+msgid "Заявка на подключение"
+msgstr "Anschlussantrag"
+
+msgid "Заявки на подключение"
+msgstr "Anschlussanträge"
+
+msgid "Пользователи"
+msgstr "Benutzer"

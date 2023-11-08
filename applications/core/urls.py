@@ -21,12 +21,15 @@ urlpatterns = [
     path('invitations/<int:pk>/', InvitationUpdateView.as_view(), name='invitation-update'),
     
     # employer
+    path('employer-company-create/', EmployerCompanyView.as_view(), name='employer-company'),
     path('employer-company-list/', EmployerListApiView.as_view(), name='employer-company-list'),
     path('employer-company-change-detail/<int:pk>/', EmployerCompanyMixins.as_view(), name='employer-company-change-detail'),
-
-    
     # path('university/', UniversityView.as_view(), name='university'),
     # path('faculty/', FacultyView.as_view(), name='faculty'),
+
+
+
+    path('employer_company/<int:company_id>/', employer_company_detail, name='employer_company_detail'),
 ]
 
 
