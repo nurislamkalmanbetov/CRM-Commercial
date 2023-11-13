@@ -107,70 +107,109 @@ class InvatationGetSerializer(serializers.ModelSerializer):
         fields = ['id', 'user_email', 'message', 'status', 'vacancy', 'employer_email']
 
 
+class SubcategorySerializers(serializers.ModelSerializer):
+    category_name = serializers.CharField(source='category.name')
+
+    class Meta:
+        model = Subcategory
+        fields = ['id', 'name', 'category_name']
+
+class CategorySerializers(serializers.ModelSerializer):
+    subcategories = SubcategorySerializers(many=True)
+
+    class Meta:
+        model = Category
+        fields = ['id', 'name', 'subcategories']
+
+
+
 class VacancySerializers(serializers.ModelSerializer):
-    employer_company = EmployerCompanySerialzers()
+    user = serializers.EmailField(source='employer_company.user.email')
+    category = serializers.CharField(source='category.name', required=False)
+    subcategory = serializers.CharField(source='subcategory.name', required=False)
 
     class Meta:
         model = Vacancy
         fields = [
             'id',
+            'user',
+            'picture',
+            'name', 
+            'category',
+            'subcategory',
+            'salary', 
+            'exchange',
+            'duty', 
+            'city', 
             'language',
             'proficiency',
-            'picture',
-            'employer_company',
-            'name',
-            'salary',
-            'duty',
-            'city',
-            'accomodation_type',
-            'accomodation_cost',
-            'is_vacancy_confirmed',
+            'accomodation_type', 
+            'accomodation_cost', 
+            'is_vacancy_confirmed', 
             'insurance',
-            'transport',
-            'contact_info',
-            'destination_point',
-            'employer_dementions',
+            'required_positions',
+            'transport', 
+            'contact_info', 
+            'destination_point', 
+            'employer_dementions', 
             'extra_info',
-            'is_new',
         ]
 
     def create(self, validated_data):
-        employer_company_data = validated_data.pop('employer_company')
-        employer_company_name = employer_company_data.get('name')
-        employer_company_country = employer_company_data.get('country')
+        user_email = validated_data.pop('employer_company').get('user').get('email')
+        user = EmployerCompany.objects.get(user__email=user_email)
 
-        user_email = employer_company_data.get('user').get('email')
-        user = User.objects.get(email=user_email)
+        category_data = validated_data.pop('category', None)
+        subcategory_data = validated_data.pop('subcategory', None)
 
-        employer_company, created = EmployerCompany.objects.get_or_create(
-            name=employer_company_name, user=user, country=employer_company_country
-        )
+        category_instance = None
+        if category_data:
+            category_instance, created = Category.objects.get_or_create(**category_data)
 
-        validated_data['user'] = user  # Set the user for the Vacancy instance
+        subcategory_instance = None
+        if subcategory_data:
+            subcategory_data['category'] = category_instance
+            subcategory_instance, created = Subcategory.objects.get_or_create(**subcategory_data)
 
-        vacancy = Vacancy.objects.create(employer_company=employer_company, **validated_data)
+        # Check if subcategory_instance is a dictionary (indicating an error)
+        if isinstance(subcategory_instance, dict):
+            raise serializers.ValidationError({'subcategory': ['Invalid subcategory data']})
 
-        # Отправляем уведомление через WebSocket после успешного создания вакансии
-        channel_layer = get_channel_layer()
-        async_to_sync(channel_layer.group_send)(
-            'notifications',
-            {
-                'type': 'send_notification',
-                'message': 'Новая вакансия создана!'
-            }
-        )
-
+        # Create the Vacancy object after obtaining the necessary category_instance
+        vacancy = Vacancy.objects.create(employer_company=user, category=category_instance, subcategory=subcategory_instance, **validated_data)
         return vacancy
     
-    
-    def get_is_new(self, obj):
-        return obj.is_new()
+
+    def update(self, validated_data):
+        user_email = validated_data.pop('employer_company').get('user').get('email')
+        user = User.objects.get(email=user_email)
+        vacancy = Vacancy.objects.update(employer_company=user.employer_company, **validated_data)
+        return vacancy
 
 
 class VacancyFilterSerializer(serializers.ModelSerializer):
+    category_name = serializers.SerializerMethodField()
+    subcategory_name = serializers.SerializerMethodField()
+    employer_company_name = serializers.SerializerMethodField()
+
     class Meta:
         model = Vacancy
-        fields = '__all__'
+        fields = [
+            'id', 'user', 'picture', 'name','employer_company_name', 'category_name', 'subcategory_name', 'salary', 'exchange', 'duty',
+            'city', 'language', 'proficiency', 'accomodation_type', 'accomodation_cost', 'is_vacancy_confirmed',
+            'insurance', 'required_positions', 'transport', 'contact_info', 'destination_point',
+            'employer_dementions', 'extra_info', 'created_date'
+        ]
+
+    def get_category_name(self, obj):
+        return obj.category.name if obj.category else None
+
+    def get_subcategory_name(self, obj):
+        return obj.subcategory.name if obj.subcategory else None
+
+    def get_employer_company_name(self, obj):
+        return obj.employer_company.name if obj.employer_company else None
+
 
 
 class VacancyChangeSerializer(serializers.ModelSerializer):

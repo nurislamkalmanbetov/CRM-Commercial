@@ -4,17 +4,21 @@ from .views import *
 
 
 urlpatterns = [
+    # vacancy
     path('vacancy/', VacancyListView.as_view(), name='vacancy'),
     path('vacancy-change-detail/<int:pk>/', VacancyChangeView.as_view(), name='vacancy-change-detail'),
     path('individual-vacancies/', VacancyByEmployeeEmailAPIView.as_view(), name='individual-vacancies'),
-    # path('favorite-vacancies/', FavoriteVacancyCreateAPIView.as_view(), name='favorite-vacancy'),
     path('vacancies-filter/', VacancyListCreateAPIView.as_view(), name='vacancies-filter'),
+    path('vacancies-list/', VacancyListApiView.as_view(), name='vacancies-list'),
     path('review-get', ReviewVacancyListView.as_view(), name='review-get'),
     path('new-vacancy/', NewVacancyView.as_view(), name='new-vacancy'),
     path('review-create', ReviewVacancyCreateView.as_view(), name='review-create'),
     path('review-patch/<int:pk>/', ReviewVacancyUpdateView.as_view(), name='review-patch'),
     path('company-review-create/', CompanyReviewView.as_view(), name='company-review'),
-                                
+    
+    # category-subcategory
+    path('categories/', CategoryView.as_view(), name='category-list'),                      
+
     # invation
     path('invitations/create/', InvitationCreateView.as_view(), name='invitation-create'),
     path('invitations/', InvitationListView.as_view(), name='invitation-list'),

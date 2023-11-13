@@ -37,10 +37,24 @@ class EmployerCompanyAdmin(admin.ModelAdmin):
     search_fields = ['name', ]
 
 
+@admin.register(Category)
+class CategoryAdmin(admin.ModelAdmin):
+    list_display =  [
+        'id', 'name',
+    ]
+
+
+@admin.register(Subcategory)
+class SubcategoryAdmin(admin.ModelAdmin):
+    list_display =  [
+        'id', 'name', 'category',
+    ]
+
+
 @admin.register(Vacancy)
 class VacancyAdmin(admin.ModelAdmin):
     list_display =  [
-        'id', 'name', 'language', 'user', 'employer_company', 'required_positions', 'salary', 'city', 'destination_point'
+        'id', 'name', 'category', 'subcategory', 'language', 'user', 'employer_company', 'required_positions', 'salary', 'city', 'destination_point'
     ]
 
 
