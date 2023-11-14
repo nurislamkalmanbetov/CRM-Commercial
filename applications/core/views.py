@@ -121,13 +121,10 @@ class VacancyListCreateAPIView(mixins.ListModelMixin,
         return self.create(request, *args, **kwargs)
 
 
-class VacancyChangeView(mixins.RetrieveModelMixin,
-                        mixins.UpdateModelMixin,
-                        mixins.DestroyModelMixin, GenericAPIView):
-    queryset = Vacancy.objects.all()
+class VacancyChangeView(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixins.DestroyModelMixin, GenericAPIView):
+    queryset = Vacancy.objects.filter(is_vacancy_confirmed=True).select_related('category', 'subcategory')
     serializer_class = VacancyChangeSerializer
     parser_classes = (MultiPartParser, FormParser)
-
 
     def get(self, request, *args, **kwargs):
         return self.retrieve(request, *args, **kwargs)
@@ -143,6 +140,7 @@ class VacancyChangeView(mixins.RetrieveModelMixin,
         if response.status_code == status.HTTP_204_NO_CONTENT:
             return Response({"message": "Успешно удалено"}, status=status.HTTP_200_OK)
         return response
+
 
 
 class VacancyByEmployeeEmailAPIView(generics.ListAPIView):

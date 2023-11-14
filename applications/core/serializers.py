@@ -213,11 +213,32 @@ class VacancyFilterSerializer(serializers.ModelSerializer):
 
 
 class VacancyChangeSerializer(serializers.ModelSerializer):
+    category_name = serializers.SerializerMethodField()
+    subcategory_name = serializers.SerializerMethodField()
+    employer_company_name = serializers.SerializerMethodField()
+
+    def get_category_name(self, obj):
+        return obj.category.name if obj.category else None
+
+    def get_subcategory_name(self, obj):
+        return obj.subcategory.name if obj.subcategory else None
+
+    def get_employer_company_name(self, obj):
+        return obj.employer_company.name if obj.employer_company else None
+
     class Meta:
         model = Vacancy
-        fields = ['id', 'picture', 'name', 'salary', 'city', 'accomodation_cost', 'insurance', 'transport',
-                  'contact_info', 'destination_point', 'employer_dementions', 'extra_info', 'duty',
+        fields = [
+            'id', 'picture', 'user', 'name', 'category_name',
+            'subcategory_name', 'salary', 'exchange', 'city', 'accomodation_cost', 'insurance',
+            'transport', 'contact_info', 'destination_point', 'employer_dementions', 'extra_info', 'duty',
+            'language', 'required_positions', 'proficiency', 'accomodation_type', 'employer_company_name'
         ]
+
+
+
+
+
 
 
 class ReviewVacancySerializer(serializers.ModelSerializer):
