@@ -116,6 +116,30 @@ class EmployerCompany(models.Model):
         verbose_name_plural = _('Работодатели')
 
 
+class Category(models.Model):
+    name = models.CharField(_('Категория'), max_length=255, db_index=True)
+    
+    def __str__(self):
+        return self.name
+    
+    class Meta:
+        verbose_name = _('Категория')
+        verbose_name_plural = _('Категории')
+
+
+class Subcategory(models.Model):
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, verbose_name=_('Категория'), related_name='subcategories')
+    name = models.CharField(_('Подкатегория'), max_length=255, db_index=True)
+
+    def __str__(self):
+        return self.name
+    
+    class Meta:
+        verbose_name = _('Подкатегория')
+        verbose_name_plural = _('Подкатегории')
+
+
+
 class Vacancy(models.Model):
 
     LANGUAGE_CHOICES = (
@@ -149,15 +173,15 @@ class Vacancy(models.Model):
         ('no', _('Не предоставляется')),
     )
     picture = models.ImageField(upload_to='vacancy_pics/', blank=True)
-    user = models.ForeignKey('accounts.User', on_delete=models.CASCADE, verbose_name=_('Работодатель'))
+    user = models.ForeignKey('accounts.User', on_delete=models.CASCADE, verbose_name=_('Работодатель'), db_index=True)
     employer_company = models.ForeignKey(EmployerCompany, verbose_name=_('Компания работодателя'),
-                                         on_delete=models.CASCADE, related_name='vacancies')
+                                         on_delete=models.CASCADE, related_name='vacancies', db_index=True)
 
     required_positions = models.PositiveIntegerField(_('Требуемое количество мест'), default=1)
     required_positions_reviews = models.PositiveIntegerField(_('Колличество одобренных вакансии'), default=0)
     exchange = models.CharField(max_length=10, choices=EXCHANGE, default='', blank=True)
     name = models.CharField(_('Название вакансии'), max_length=255)
-    salary = models.CharField(_('Зарплата'), max_length=128)
+    salary = models.IntegerField(_('Зарплата'))
     duty = models.TextField(_('Обязанности работника'), blank=True, default='')
     city = models.CharField(_('Город'), max_length=128, blank=True, default='')
     accomodation_type = models.CharField(_('Жилье'), choices=ACCOMODATION_TYPE_CHOICES, max_length=50,
@@ -170,7 +194,10 @@ class Vacancy(models.Model):
     destination_point = models.TextField(_('Пункт назначения'), blank=True, default='')
     employer_dementions = models.CharField(_('Требования работодателя'), max_length=128, blank=True, default='')
     extra_info = models.CharField(_('Доп. информация'), max_length=255, blank=True, default='')
-    created_date = models.DateTimeField(auto_now_add=True, verbose_name=_('Дата публикации'))
+    created_date = models.DateTimeField(default=timezone.now, verbose_name=_('Дата публикации'))
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True, verbose_name=_('Категория'), db_index=True)
+    subcategory = models.ForeignKey(Subcategory, on_delete=models.SET_NULL, null=True, blank=True, verbose_name=_('Подкатегория'), db_index=True)
+
 
     def __str__(self):
         return self.name

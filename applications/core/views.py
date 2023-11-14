@@ -4,16 +4,30 @@ from applications.accounts.models import User
 from django_filters import rest_framework as django_filters
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_yasg2.utils import swagger_auto_schema
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 from rest_framework import filters, generics, status
 from rest_framework.generics import (GenericAPIView, ListAPIView,
                                      UpdateAPIView, mixins)
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.parsers import FormParser, MultiPartParser
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
+
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .models import Vacancy
 from .serializers import *
+
+
+
+class CategoryView(generics.ListAPIView):
+    queryset = Category.objects.select_related().all()
+    serializer_class = CategorySerializers
+
+    def get(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
+
 
 
 class VacancyPagination(PageNumberPagination):
@@ -22,33 +36,64 @@ class VacancyPagination(PageNumberPagination):
     max_page_size = 10000
 
 
-class VacancyListView(generics.ListCreateAPIView):
-    queryset = Vacancy.objects.filter(is_vacancy_confirmed=True)
+class VacancyListView(generics.CreateAPIView):
     serializer_class = VacancySerializers
-    pagination_class = VacancyPagination
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['employer_company', 'city']
-    search_fields = ['name', 'extra_info']
+    queryset = Vacancy.objects.all()
+    parser_classes = (MultiPartParser, FormParser)
 
     def perform_create(self, serializer):
-        user_data = self.request.data.get('employer_company').get('user')
-        
+        user_data = self.request.data.get('user')
         try:
             user = User.objects.get(email=user_data)
         except User.DoesNotExist:
-            raise serializers.ValidationError({'detail': 'Вы не зарегистрированы'})
-            
+            raise serializers.ValidationError({'detail': 'User not found.'})
+
         if not user.is_employer:
-            raise serializers.ValidationError({'detail': 'Вы не работодатель'})
-            
+            raise serializers.ValidationError({'detail': 'You are not an employer.'})
+
         if user.is_employer and not user.is_active:
-            raise serializers.ValidationError({'detail': 'Ваш профиль не активный'})
-        
+            raise serializers.ValidationError({'detail': 'Your account is not active.'})
+
+        try:
+            company = EmployerCompany.objects.get(user=user)
+        except EmployerCompany.DoesNotExist:
+            raise serializers.ValidationError({'detail': 'У вас не заполнен профиль. Заполните, пожалуйста, профиль.'})
+
         serializer.save(user=user)
+        
+
 
     def post(self, request, *args, **kwargs):
         return self.create(request, *args, **kwargs)
     
+    
+from django.db.models import Q
+
+
+class VacancyListApiView(ListAPIView):
+    serializer_class = VacancySerializers
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
+    filterset_fields = ['employer_company__name', 'city', 'employer_company__user__email', 'category__name', 'subcategory__name']
+    search_fields = ['name', 'extra_info', 'employer_company__name']
+    pagination_class = VacancyPagination
+
+    def get_queryset(self):
+        category_name = self.request.query_params.get('category__name', None)
+        subcategory_name = self.request.query_params.get('subcategory__name', None)
+
+        # Handle filtering by category and/or subcategory
+        queryset = Vacancy.objects.filter(is_vacancy_confirmed=True)
+
+        if category_name:
+            queryset = queryset.filter(category__name=category_name).select_related('category')
+
+        if subcategory_name:
+            queryset = queryset.filter(subcategory__name=subcategory_name).select_related('subcategory')
+
+        return queryset
+
+
+
 
 class VacancyFilter(django_filters.FilterSet):
     name = django_filters.CharFilter(lookup_expr='icontains')  # case-insensitive partial match for vacancy name
@@ -64,7 +109,7 @@ class VacancyListCreateAPIView(mixins.ListModelMixin,
                                mixins.CreateModelMixin,
                                generics.GenericAPIView):
 
-    queryset = Vacancy.objects.all()
+    queryset = Vacancy.objects.select_related('category', 'subcategory', 'employer_company__user').all()
     serializer_class = VacancyFilterSerializer
     filter_backends = (django_filters.DjangoFilterBackend, filters.OrderingFilter)
     filterset_class = VacancyFilter
@@ -76,13 +121,10 @@ class VacancyListCreateAPIView(mixins.ListModelMixin,
         return self.create(request, *args, **kwargs)
 
 
-class VacancyChangeView(mixins.RetrieveModelMixin,
-                        mixins.UpdateModelMixin,
-                        mixins.DestroyModelMixin, GenericAPIView):
-    queryset = Vacancy.objects.all()
+class VacancyChangeView(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixins.DestroyModelMixin, GenericAPIView):
+    queryset = Vacancy.objects.filter(is_vacancy_confirmed=True).select_related('category', 'subcategory')
     serializer_class = VacancyChangeSerializer
     parser_classes = (MultiPartParser, FormParser)
-
 
     def get(self, request, *args, **kwargs):
         return self.retrieve(request, *args, **kwargs)
@@ -100,12 +142,16 @@ class VacancyChangeView(mixins.RetrieveModelMixin,
         return response
 
 
+
 class VacancyByEmployeeEmailAPIView(generics.ListAPIView):
-    queryset = Vacancy.objects.all()
     serializer_class = VacancySerializers
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     filterset_fields = ['employer_company__user__email']
     search_fields = ['employer_company__user__email']
+
+    def get_queryset(self):
+        queryset = Vacancy.objects.all().select_related('employer_company__user')
+        return queryset
 
 
 class ReviewVacancyCreateView(mixins.CreateModelMixin, generics.GenericAPIView):
@@ -131,10 +177,14 @@ class ReviewVacancyCreateView(mixins.CreateModelMixin, generics.GenericAPIView):
 
 
 class ReviewVacancyListView(ListAPIView):
-    queryset = ReviewVacancy.objects.all()
+    queryset = ReviewVacancy.objects.all().select_related('applicant_profile__user', 'employer')
     serializer_class = ReviewVacancySerializer
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
-    filterset_fields = ['status','applicant_profile__user__email', 'employer__email']
+    filterset_fields = ['status', 'applicant_profile__user__email', 'employer__email']
+
+    def get_queryset(self):
+        return self.queryset
+
     
     
 INVITATION_COMMENT = "Ваша заявка была одобрена. Мы ждем вас!"
@@ -175,9 +225,11 @@ class InvitationCreateView(generics.CreateAPIView):
         serializer.save()
 
 
+
 class InvitationListView(generics.ListAPIView):
-    queryset = Invitation.objects.all()
+    queryset = Invitation.objects.select_related('user', 'vacancy', 'employer')
     serializer_class = InvatationGetSerializer
+    
 
 
 class InvitationUpdateView(generics.UpdateAPIView):
@@ -193,7 +245,6 @@ class InvitationUpdateView(generics.UpdateAPIView):
         return Response({"error": "Invalid status"}, status=status.HTTP_400_BAD_REQUEST)
 
 
-
 class NewVacancyView(ListAPIView):
     serializer_class = VacancySerializers
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
@@ -201,16 +252,14 @@ class NewVacancyView(ListAPIView):
     search_fields = ['name', 'extra_info']
 
     def get_queryset(self):
-     
         current_date = datetime.now()
-        
         three_days_ago = current_date - timedelta(days=3)
 
-    
         return Vacancy.objects.filter(
             is_vacancy_confirmed=True,
             created_date__range=(three_days_ago, current_date)
-        )
+        ).select_related('employer_company', 'category', 'subcategory')
+
     
 
 class CompanyReviewView(generics.CreateAPIView):
@@ -240,15 +289,14 @@ class CompanyReviewView(generics.CreateAPIView):
         return self.create(request, *args, **kwargs)
 
 
-
-
 class EmployerListApiView(ListAPIView):
     serializer_class = EmployerCompanySerialzers
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['user__email']
 
     def get_queryset(self):
-        return EmployerCompany.objects.all()
+        return EmployerCompany.objects.all().select_related('user')
+
     
 
 

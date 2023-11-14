@@ -965,3 +965,17 @@ msgstr "Anschlussanträge"
 
 msgid "Пользователи"
 msgstr "Benutzer"
+
+
+
+msgid "Категория"
+msgstr "Category"
+
+msgid "Категории"
+msgstr "Categorys"
+
+msgid "Подкатегория"
+msgstr "Subcategory"
+
+msgid "Подкатегории"
+msgstr "Subcategorys"
