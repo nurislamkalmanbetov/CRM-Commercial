@@ -272,6 +272,22 @@ class ConnectionRequestListCreateView(generics.ListCreateAPIView):
 
 
 
+# В вашем файле views.py в приложении accounts или в новом приложении
+
+from rest_framework import generics
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.authentication import TokenAuthentication
+
+class MyView(generics.ListAPIView):
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request, *args, **kwargs):
+        response = {
+            'message': 'Token works.'
+        }
+        return Response(response, status=200)
 
 
 # ___

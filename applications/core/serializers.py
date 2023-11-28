@@ -213,6 +213,7 @@ class VacancyFilterSerializer(serializers.ModelSerializer):
 
 
 class VacancyChangeSerializer(serializers.ModelSerializer):
+    user = serializers.EmailField(source='employer_company.user.email', read_only=True)
     category_name = serializers.SerializerMethodField()
     subcategory_name = serializers.SerializerMethodField()
     employer_company_name = serializers.SerializerMethodField()

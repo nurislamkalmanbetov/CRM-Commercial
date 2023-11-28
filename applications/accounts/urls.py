@@ -10,6 +10,7 @@ router.register(r'announcements', AnnouncementViewSet)
 
 
 urlpatterns = [
+    path('auth/', include('drf_social_oauth2.urls', namespace='drf')),
     path('signin/', UserLoginView.as_view(), name='signin'),
     path('profiles-create/', ProfileView.as_view(), name='profile-create'),
     path('user-lists/', UserView.as_view(), name='user-list'),
@@ -38,13 +39,6 @@ urlpatterns = [
     # conetction request
     path('connection-requests/', ConnectionRequestListCreateView.as_view(), name='connection-requests-list-create'),
     # path('connection-requests/<int:pk>/', ConnectionRequestDetailView.as_view(), name='connection_request_detail'),
-
-
-
-
-
-
-
 
     path('login/', user_login, name='login'),
 ]

@@ -22,9 +22,39 @@ class UserSerializer(serializers.ModelSerializer):
         return user
 
 
+from rest_framework.exceptions import AuthenticationFailed
+from django.contrib import auth
+
+
+
 class UserLoginSerializer(serializers.Serializer):
     email = serializers.EmailField(required=True, allow_blank=False, allow_null=False)
     password = serializers.CharField(required=True, allow_blank=False, allow_null=False)
+
+    def validate(self, attrs):
+        email = attrs.get('email', '')
+        password = attrs.get('password', '')
+        filtered_user_by_email = User.objects.filter(email=email)
+        user = auth.authenticate(email=email, password=password)
+
+        if filtered_user_by_email.exists() and filtered_user_by_email[0].auth_provider != 'email':
+            raise AuthenticationFailed(
+                detail='Please continue your login using ' + filtered_user_by_email[0].auth_provider)
+
+        if not user:
+            raise AuthenticationFailed('Invalid credentials, try again')
+        if not user.is_active:
+            raise AuthenticationFailed('Account disabled, contact admin')
+        if not user.is_verified:
+            raise AuthenticationFailed('Email is not verified')
+
+        return {
+            'email': user.email,
+            'username': user.username,
+            'tokens': user.tokens
+        }
+
+        return super().validate(attrs)
 
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
@@ -188,5 +218,31 @@ class ConnectionRequestSerializer(serializers.ModelSerializer):
     class Meta:
         model = ConnectionRequest
         fields = ('id', 'full_name', 'email', 'phone', 'request_date', 'manager_notes', 'call_date', 'called', 'consulted', 'call_later')
+
+
+
+from rest_framework import serializers
+from .models import RefreshToken
+
+class InvalidateRefreshTokensSerializer(serializers.Serializer):
+    client_id = serializers.CharField(required=True)
+
+    def create(self, validated_data):
+        client_id = validated_data.get('client_id')
+
+        # Инвалидация токенов для переданного client_id
+        try:
+            # Получаем все токены для указанного client_id
+            tokens = RefreshToken.objects.filter(client_id=client_id)
+
+            # Инвалидируем найденные токены
+            for token in tokens:
+                token.is_valid = False
+                token.save()
+
+            return validated_data  # Подтверждение успешной инвалидации
+        except Exception as e:
+            # Обработка ошибки, если что-то пошло не так
+            raise serializers.ValidationError("Failed to invalidate tokens")
 
 

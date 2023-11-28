@@ -25,7 +25,7 @@ from .juzmin import JAZZMIN_SETTINGS, JAZZMIN_UI_TWEAKS
 
 env = environ.Env()
 environ.Env.read_env(env_file='.env')
-# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
@@ -34,7 +34,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'ADsafaegksdgfsdlgsklgk2444234dsflmfsdlgsdklgk34flskdgd'
+SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -45,7 +45,8 @@ if not DEBUG:
         integrations=[DjangoIntegration()]
     )
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+
 
 # Application definition
 
@@ -61,6 +62,7 @@ INSTALLED_APPS = [
     #admin panel
     'jazzmin',
 
+    'django.contrib.sites',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -74,6 +76,7 @@ INSTALLED_APPS = [
     'applications.accounts',
     'applications.core',
     'applications.common',
+    'applications.social_auth',
 
     #backend
     'drf_yasg2',
@@ -87,6 +90,35 @@ INSTALLED_APPS = [
 
     # translate
     'modeltranslation',
+
+    # google auth
+    'oauth2_provider',
+    'social_django',
+    'drf_social_oauth2',
+]
+
+AUTH_USER_MODEL = 'accounts.User'
+
+# new
+AUTHENTICATION_BACKENDS = [
+   'drf_social_oauth2.backends.DjangoOAuth2',
+   'django.contrib.auth.backends.ModelBackend',
+
+    # Google  OAuth2
+    'social_core.backends.google.GoogleOAuth2',
+    # drf-social-oauth2
+    'drf_social_oauth2.backends.DjangoOAuth2',
+    # Django
+    'django.contrib.auth.backends.ModelBackend',
+]
+
+# Google configuration
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '7559994281-ql07auiv4bftm2lvir9gh28mt9rsh7j8.apps.googleusercontent.com'
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = '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'
+
+SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = [
+    'https://www.googleapis.com/auth/userinfo.email',
+    'https://www.googleapis.com/auth/userinfo.profile',
 ]
 
 QUERYCOUNT = {
@@ -102,9 +134,7 @@ QUERYCOUNT = {
     'RESPONSE_HEADER': 'X-DjangoQueryCount-Count'
 }
 
-
 default_app_config = 'applications.core.apps.CoreConfig'
-
 
 CHANNEL_LAYERS = {
     'default': {
@@ -122,13 +152,15 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.BasicAuthentication',
         'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
+        #new
+        'oauth2_provider.contrib.rest_framework.OAuth2Authentication',  
+        'drf_social_oauth2.authentication.SocialAuthentication',
     ],
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated'
+        'rest_framework.permissions.AllowAny'
     ]
 }
-
-
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -140,9 +172,17 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'querycount.middleware.QueryCountMiddleware',
+
+    'allauth.account.middleware.AccountMiddleware',
 ]
 
 ROOT_URLCONF = 'iwex_crm.urls'
+
+# new
+TEMPLATE_CONTEXT_PROCESSORS = (
+    'social_django.context_processors.backends',
+    'social_django.context_processors.login_redirect',
+)
 
 TEMPLATES = [
     {
@@ -156,6 +196,10 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'django.template.context_processors.i18n',
+                'django.template.context_processors.request',
+                # new
+                'social_django.context_processors.backends',
+                'social_django.context_processors.login_redirect',
             ],
         },
     },
@@ -166,26 +210,26 @@ WSGI_APPLICATION = 'iwex_crm.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-#         'NAME': env('POSTGRES_DB'),
-#         'USER': env('POSTGRES_USER'),
-#         'PASSWORD': env('POSTGRES_PASSWORD'),
-#         'HOST': env('POSTGRES_HOST'),
-#         'PORT': env('POSTGRES_PORT'),
-#     }
-# }
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'iwex-crm-master6',
-        'USER': 'postgres',
-        'PASSWORD': 'qwerty123',
-        'HOST': 'localhost',
-        'PORT': '5432',
+        'NAME': env('POSTGRES_DB'),
+        'USER': env('POSTGRES_USER'),
+        'PASSWORD': env('POSTGRES_PASSWORD'),
+        'HOST': env('POSTGRES_HOST'),
+        'PORT': env('POSTGRES_PORT'),
     }
 }
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#         'NAME': 'iwex-crm-master6',
+#         'USER': 'postgres',
+#         'PASSWORD': 'qwerty123',
+#         'HOST': 'localhost',
+#         'PORT': '5432',
+#     }
+# }
 
 
 
@@ -282,10 +326,10 @@ EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
 DEFAULT_FROM_EMAIL = 'IWEX'
 
+# AUTH_USER_MODEL = 'email'
+# ACCOUNT_AUTHENTICATION_METHOD ="email"
 
 
-
-AUTH_USER_MODEL = 'accounts.User'
 JQUERY_URL = False
 
 # Login url for @login_required decorator
