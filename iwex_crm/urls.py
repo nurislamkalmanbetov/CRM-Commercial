@@ -7,40 +7,12 @@ from django.urls import path, include, re_path
 from rest_framework import permissions
 from drf_yasg2.views import get_schema_view
 from drf_yasg2 import openapi
+from django.contrib.auth import views as auth_views
 
 
 
 
-from .views import (
-    main_page,
-    personal_page,
-    notifications_page,
-    documents_study_certificate,
-    documents_photo_for_schengen,
-    documents_zagranpassport_copy,
-    documents_passport_copy,
-    documents_fluorography_express,
-    documents_fluorography,
-    documents_immatrikulation,
-    documents_bank_details,
-    documents_parental_permission,
-    documents_drugdispanser_certificate,
-    documents_mentaldispanser_certificate,
-    documents_conduct_certificate,
-    documents_bank_statement,
-    documents_transcript,
-    files_page,
-    notification_details_page,
-    error_404_page,
-    error_500_page,
-    documents_registration_page,
-    documents_embassy_page,
-    documents_study_certificate_embassy,
-    documents_study_certificate_translate_embassy,
-    documents_transcript_translate,
-    registration_documents_view,
-    embassy_documents_view,
-)
+from .views import *
 
 from django.views.i18n import set_language
 
@@ -57,7 +29,7 @@ schema_view = get_schema_view(
     ),
     public=True,
     permission_classes=(permissions.AllowAny,),
-    url='https://crm.iwex.kg',
+#     url='https://crm.iwex.kg',
 )
 
 urlpatterns = [

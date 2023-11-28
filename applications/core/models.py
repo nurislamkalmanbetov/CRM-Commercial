@@ -3,14 +3,14 @@ from django.db import models
 from django.db.models import Sum
 
 from django.utils.translation import gettext, gettext_lazy as _
-
+from ckeditor.fields import RichTextField
 
 
 class University(models.Model):
     name = models.CharField(_('Название'), max_length=500)
     name_ru = models.CharField(_('Название на русском'), max_length=500)
     name_de = models.CharField(_('Название на немецком'), max_length=500)
-    address = models.TextField(_('Адрес на немецком'))
+    address = RichTextField(_('Адрес на немецком'))
     phone = models.CharField(_('Номер телефона'), max_length=50)
     site = models.URLField(_('Сайт университета'))
 
@@ -68,7 +68,7 @@ class ContractAdmin(models.Model):
     gender = models.CharField(_('Пол'), choices=GENDER_CHOICES, max_length=1, default=MALE)
     patent_id = models.CharField(_('Номер патента (N1234567)'), max_length=20, default='')
     patent_date = models.DateField(_('Дата получения патента'))
-    given_by = models.TextField(_('Выдан (УГНС по Ленинскому району)'))
+    given_by = RichTextField(_('Выдан (УГНС по Ленинскому району)'))
 
     class Meta:
         ordering = ['id', ]
@@ -92,7 +92,7 @@ class EmployerCompany(models.Model):
     user = models.ForeignKey('accounts.User', on_delete=models.CASCADE, blank=True, verbose_name=_('Работодатель'))
     name = models.CharField(verbose_name=_('Название'), blank=True, max_length=255)
     country = models.CharField(_('страна'), max_length=128, blank=True, default='')
-    description = models.TextField(_('Описание'), blank=True, default='')
+    description = RichTextField(_('Описание'), blank=True, default='')
 
     def __str__(self):
         return self.name
@@ -113,7 +113,7 @@ class CompanyReview(models.Model):
     company = models.ForeignKey(EmployerCompany, on_delete=models.CASCADE, related_name='reviews', verbose_name=_('Компания'))
     user = models.ForeignKey('accounts.User', on_delete=models.CASCADE, verbose_name=_('Пользователь'))  # Предполагается, что отзыв может оставить зарегистрированный пользователь
     rating = models.PositiveSmallIntegerField(choices=RATING_CHOICES, verbose_name=_('Рейтинг'))
-    comment = models.TextField(verbose_name=_('Комментарий'), blank=True)
+    comment = RichTextField(verbose_name=_('Комментарий'), blank=True)
     is_review_confirmed = models.BooleanField(verbose_name=_('Прошел модерацию'), default=False)
     created_date = models.DateTimeField(auto_now_add=True, verbose_name=_('Дата публикации'))
 
@@ -191,7 +191,7 @@ class Vacancy(models.Model):
     exchange = models.CharField(max_length=10, choices=EXCHANGE, default='', blank=True)
     name = models.CharField(_('Название вакансии'), max_length=255)
     salary = models.IntegerField(_('Зарплата'), )
-    duty = models.TextField(_('Обязанности работника'), blank=True, default='')
+    duty = RichTextField(_('Обязанности работника'), blank=True, default='')
     city = models.CharField(_('Город'), max_length=128, blank=True, default='')
     accomodation_type = models.CharField(_('Жилье'), choices=ACCOMODATION_TYPE_CHOICES, max_length=50,
                                          default='', blank=True)
@@ -199,8 +199,8 @@ class Vacancy(models.Model):
     is_vacancy_confirmed = models.BooleanField(_('Прошел на вакансию'), default=False)
     insurance = models.BooleanField(_('Страховка'), default=False)
     transport = models.CharField(_('Транспорт'), max_length=128, blank=True, default='')
-    contact_info = models.TextField(_('Контактные данные'), blank=True, default='')
-    destination_point = models.TextField(_('Пункт назначения'), blank=True, default='')
+    contact_info = models.CharField(_('Контактные данные'),max_length=128, blank=True, default='')
+    destination_point = RichTextField(_('Пункт назначения'), blank=True, default='')
     employer_dementions = models.CharField(_('Требования работодателя'), max_length=128, blank=True, default='')
     extra_info = models.CharField(_('Доп. информация'), max_length=255, blank=True, default='')
     created_date = models.DateTimeField(auto_now_add=True, verbose_name=_('Дата публикации'))
@@ -227,7 +227,7 @@ class ReviewVacancy(models.Model):
     applicant_profile = models.ForeignKey('accounts.Profile', on_delete=models.CASCADE, verbose_name=_('Профиль соискателя'))
     employer = models.ForeignKey('accounts.User', on_delete=models.CASCADE, verbose_name=_('Работодатель'))
     vacancy = models.ForeignKey(Vacancy, on_delete=models.CASCADE, verbose_name=_('Вакансия'))
-    employer_comment = models.TextField(_('Комментарий работодателя'), blank=True, default='')
+    employer_comment = RichTextField(_('Комментарий работодателя'), blank=True, default='')
 
     def __str__(self):
         return f'{self.applicant_profile.user}-{self.vacancy.name}'
@@ -276,7 +276,7 @@ class Invitation(models.Model):
     user = models.ForeignKey('accounts.User', on_delete=models.CASCADE, related_name="invitations")
     vacancy = models.ForeignKey(Vacancy, on_delete=models.CASCADE)
     employer = models.ForeignKey(EmployerCompany, on_delete=models.CASCADE)
-    message = models.TextField(blank=True)
+    message = RichTextField(blank=True)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
 
     def str(self):
@@ -294,7 +294,7 @@ class Feedback(models.Model):
         ('IN_PROCESS', _('В обработке')),
         ('DECLINED', _('Отклонен')),
     )
-    text = models.TextField(verbose_name=_('Текст отзыва'))
+    text = RichTextField(verbose_name=_('Текст отзыва'))
     user = models.ForeignKey('accounts.User', on_delete=models.CASCADE, verbose_name=_('Пользователь'))
     created_at = models.DateTimeField(auto_now_add=True, verbose_name=_('Дата создания'))
     status = models.CharField(max_length=12, choices=STATUS_CHOICES, default='IN_PROCESS', verbose_name=_('Статус'))
@@ -313,7 +313,7 @@ class ImprovementIdea(models.Model):
         ('IMPLEMENTED', _('Реализован')),
         ('DECLINED', _('Отклонен')),
     )
-    text = models.TextField(verbose_name=_('Текст идеи'))
+    text = RichTextField(verbose_name=_('Текст идеи'))
     user = models.ForeignKey('accounts.User', on_delete=models.CASCADE, verbose_name=_('Пользователь'))
     created_at = models.DateTimeField(auto_now_add=True, verbose_name=_('Дата создания'))
     status = models.CharField(max_length=12, choices=STATUS_CHOICES, default='NEW', verbose_name=_('Статус'))

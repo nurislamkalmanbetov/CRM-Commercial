@@ -29,6 +29,8 @@ from django.dispatch import receiver
 from model_utils import FieldTracker
 from django.utils.translation import gettext_lazy as _
 from smart_selects.db_fields import ChainedForeignKey
+from ckeditor.fields import RichTextField
+
 
 
 class User(AbstractBaseUser, PermissionsMixin):
@@ -40,7 +42,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(_('Сотрудник'), default=False)
     is_student = models.BooleanField(_('Студент'), default=False)
     is_superuser = models.BooleanField(_('Суперпользователь'), default=False)
-    is_active = models.BooleanField(_('Активен'), default=False)
+    is_active = models.BooleanField(_('Активен'), default=True)
     is_delete = models.BooleanField(_('Удален'), default=False)
     registered_at = models.DateTimeField(_('Дата регистрации'), auto_now_add=True)
     password_reset_token = models.CharField(max_length=255, null=True, blank=True)
@@ -65,7 +67,7 @@ class User(AbstractBaseUser, PermissionsMixin):
             self.is_delete = True
             self.save()
         else:
-            self.delete()
+            super(User, self).delete(*args, **kwargs)
             
     class Meta:
         verbose_name = _('Пользователь')
@@ -354,10 +356,10 @@ class Profile(models.Model):
     level = models.CharField(
         _("Уровень"), choices=LEVEL_CHOICES, max_length=20, default="", blank=True
     )
-    courses_info = models.TextField(_("Курсы"), default="", blank=True)
+    courses_info = RichTextField(_("Курсы"), default="", blank=True)
     creation_date = models.DateTimeField(auto_now_add=True, blank=True, null=True)
 
-    comment = models.TextField(_("Комментарий"), default="", blank=True)
+    comment = RichTextField(_("Комментарий"), default="", blank=True)
     note = models.CharField(_("Заметка"), default="", blank=True, max_length=255)
 
     # personal info
@@ -626,7 +628,7 @@ class Profile(models.Model):
     destination_date = models.DateTimeField('Дата и время прибытия в пункт назначения', blank=True, null=True)
     arrival_city = models.CharField('Город - пункт назначения', max_length=500, default='', blank=True)
     arrival_airport = models.CharField('Аэропорт - пункт назначения', max_length=500, default='', blank=True)
-    arrival_place = models.TextField('Пункт назначения', default='', blank=True)
+    arrival_place = RichTextField('Пункт назначения', default='', blank=True)
     marshrut = models.CharField('Маршрут', choices=MARSHRUT_CHOICES, max_length=30, default='not_exist', blank=True)
     immatrikulation_received = models.BooleanField('Immatrikulation выдан студенту на руки', default=False)
     domkom_document = models.CharField('Справка от домкома', choices=DOMKOM_DOC_CHOICES, max_length=30, default='not_exist', blank=True)
@@ -686,7 +688,7 @@ class Profile(models.Model):
     loan = models.IntegerField('Долг', blank=True, null=True)
 
     # new vacancy fields
-    living_condition = models.TextField('Условия проживания', blank=True, null=True)
+    living_condition = RichTextField('Условия проживания', blank=True, null=True)
 
     # termin fields
     new_email = models.EmailField('Новая почта', blank=True, null=True)
@@ -696,7 +698,7 @@ class Profile(models.Model):
     has_termin = models.BooleanField('Наличие термина', default=False)
 
     # new personal info
-    characteristics = models.TextField('Характеристика', default='', blank=True)
+    characteristics = RichTextField('Характеристика', default='', blank=True)
     nvks = models.BooleanField('НВКС', default=False)
 
     # new interview fields
@@ -1165,7 +1167,7 @@ class ProfileHistory(models.Model):
 
     username = models.CharField(verbose_name=_('Автор изменений'), max_length=128)
     date = models.DateTimeField(verbose_name=_('Дата изменений'), blank=True, null=True)
-    changes = models.TextField(verbose_name=_('Текст изменения'))
+    changes = RichTextField(verbose_name=_('Текст изменения'))
 
     def __str__(self):
         return self.username + "' changes"
@@ -1206,7 +1208,7 @@ def count_amount_of_profiles(sender, instance, created, **kwargs):
 
 class SupportRequest(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name=_('Пользователь'))
-    message = models.TextField(_('Сообщение'))
+    message = RichTextField(_('Сообщение'))
     created_at = models.DateTimeField(_('Дата создания'), auto_now_add=True)
    
 
@@ -1222,7 +1224,7 @@ class SupportRequest(models.Model):
 
 class SupportResponse(models.Model):
     support_request = models.ForeignKey(SupportRequest, on_delete=models.CASCADE, related_name='response')
-    message = models.TextField(_('Ответ'))
+    message = RichTextField(_('Ответ'))
     created_at = models.DateTimeField(_('Дата создания'), auto_now_add=True)
     sent = models.BooleanField(_('Отправлено'), default=False)
     
@@ -1237,7 +1239,7 @@ class SupportResponse(models.Model):
 
 class Announcement(models.Model):
     title = models.CharField(max_length=100)
-    content = models.TextField(blank=True, null=True)
+    content = RichTextField(blank=True, null=True)
     photo = models.ImageField(upload_to="announcements/", blank=True, null=True)
     video = models.FileField(upload_to="announcement_videos/", blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -1274,9 +1276,9 @@ class ConnectionRequest(models.Model):
     email = models.EmailField(_("Емайл"), unique=True)
     phone = models.CharField(_("Номер телефона"), max_length=50)
     request_date = models.DateTimeField(_("Дата заявки"), default=timezone.now)
-    manager_notes = models.TextField(_("Примечание менеджера"), blank=True, null=True)
+    manager_notes = RichTextField(_("Примечание менеджера"), blank=True, null=True)
     call_date = models.DateField(_("Дата звонка менеджера"), blank=True, null=True)
-    text = models.TextField(_("Комментарий"), blank=True, null=True)
+    text = RichTextField(_("Комментарий"), blank=True, null=True)
     called = models.BooleanField(_("Позвонил"), default=False)
     consulted = models.BooleanField(_("Проконсультирован"), default=False)
     call_later = models.BooleanField(_("Набрать позже"), default=False)

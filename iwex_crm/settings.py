@@ -49,9 +49,6 @@ ALLOWED_HOSTS = ['*']
 INSTALLED_APPS = [
     'smart_selects',
     'rangefilter',
-    # 'applications.apps.SuitConfig',
-    # 'applications.apps.JazzminConfig',
-
     'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -71,7 +68,8 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'corsheaders',
     'import_export',
-   
+    'user_visit',
+    'ckeditor',
 ]
 
 REST_FRAMEWORK = {
@@ -83,6 +81,19 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.AllowAny'
     ]
+}
+
+QUERYCOUNT = {
+    'THRESHOLDS': {
+        'MEDIUM': 50,
+        'HIGH': 200,
+        'MIN_TIME_TO_LOG':0,
+        'MIN_QUERY_COUNT_TO_LOG':0
+    },
+    'IGNORE_REQUEST_PATTERNS': [],
+    'IGNORE_SQL_PATTERNS': [],
+    'DISPLAY_DUPLICATES': None,
+    'RESPONSE_HEADER': 'X-DjangoQueryCount-Count'
 }
 
 
@@ -97,6 +108,8 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    'social_django.middleware.SocialAuthExceptionMiddleware',
+    'user_visit.middleware.UserVisitMiddleware',
 ]
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
@@ -129,7 +142,7 @@ WSGI_APPLICATION = 'iwex_crm.wsgi.application'
 DATABASES = {
    'default': {
        'ENGINE': 'django.db.backends.postgresql',
-       'NAME': 'iwex_1',
+       'NAME': 'iwex_123',
        'USER': 'postgres',
        'PASSWORD':  '8244',
        'HOST': 'localhost',
@@ -264,6 +277,15 @@ IMPORT_EXPORT_USE_TRANSACTIONS = True
 
 # settings.py
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# CKeditor Config
+CKEDITOR_CONFIGS = {
+    'default': {
+        'width': '100%',
+        'tabSpaces': 4,
+
+    }
+}
 
 JAZZMIN_SETTINGS = {
     "site_title": "IWEX",
@@ -420,8 +442,3 @@ JAZZMIN_UI_TWEAKS = {
         "success": "btn-success"
     }
 }
-
-AUTHENTICATION_BACKENDS = [
-    # Другие бекенды...
-    'applications.accounts.backends.UnhashedPasswordBackend',
-]
