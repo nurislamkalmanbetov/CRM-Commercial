@@ -1,0 +1,21 @@
+<!-- base.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Website</title>
+  <!-- Добавление скрипта Google Sign-In и клиентского ID -->
+  <script src="https://apis.google.com/js/platform.js" async defer></script>
+  <meta name="google-signin-client_id" content="446278458081-5bghmjqc2fg8kto74v6n1hts2tvbto66.apps.googleusercontent.com">
+</head>
+<body>
+  <!-- Контентные блоки, которые будут определены в дочерних шаблонах -->
+  <div class="content">
+    {% block content %}
+    
+    {% endblock %}
+  </div>
+</body>
+</html>
+

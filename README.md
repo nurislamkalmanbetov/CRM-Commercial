@@ -24,3 +24,13 @@ s is a Customer Relationship Management System designed for Warehouses. To get s
   <li>Browse to one of the following links:       http://127.0.0.1       http://localhost</li>
 </ol>
 
+## Settings Jazzmin Admi Panel
+
+For downloading, write this:
+
+1. Download Jazzmin:
+
+   ```bash
+   pip install django-jazzmin
+
+![Admin Panel Django](media/adminpanel.png)

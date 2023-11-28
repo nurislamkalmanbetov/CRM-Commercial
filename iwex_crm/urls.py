@@ -43,6 +43,7 @@ from .views import (
 )
 
 from django.views.i18n import set_language
+from applications.social_auth import views
 
 
 
@@ -60,12 +61,16 @@ schema_view = get_schema_view(
 )
 
 urlpatterns = [
-#     path("i18n/", include("django.conf.urls.i18n")),
+#     path('', views.LoginGooglePage.as_view(), name='google'),
     path('admin/', admin.site.urls),
     path('i18n/', set_language, name='set_language'),
     path('chaining/', include('smart_selects.urls')),
     path('accounts/', include('applications.accounts.urls')),
     path('core/', include('applications.core.urls')),
+    # new
+    path('auth/', include('drf_social_oauth2.urls', namespace='drf_auth')),
+
+    path('social_auth/', include(('applications.social_auth.urls', 'social_auth_app'), namespace="social_auth")),
     path('', main_page, name='main-page'),
     path('reset/', auth_views.PasswordResetView.as_view(), name='reset-password-page'),
     path('reset/done/', auth_views.PasswordResetDoneView.as_view(), name='password_reset_done'),

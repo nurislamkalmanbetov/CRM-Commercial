@@ -31,8 +31,11 @@ from applications.core.models import University, Faculty, ProfileCounter, Employ
 from django.conf import settings
 from datetime import date, timedelta
 from django.core.exceptions import ValidationError
+from rest_framework_simplejwt.tokens import RefreshToken
 
 
+
+AUTH_PROVIDERS = {'facebook': 'facebook', 'google': 'google', 'email': 'email'}
 
 class User(AbstractBaseUser, PermissionsMixin):
     avatar = models.ImageField(upload_to='user_avatar/', null=True, blank=True)
@@ -47,6 +50,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_delete = models.BooleanField('Удален', default=False)
     registered_at = models.DateTimeField('Дата регистрации', auto_now_add=True)
     password_reset_token = models.CharField(max_length=255, null=True, blank=True)
+    auth_provider = models.CharField(max_length=255, blank=False, null=False, default=AUTH_PROVIDERS.get('email'))
 
 
     USERNAME_FIELD = 'email'
@@ -70,6 +74,13 @@ class User(AbstractBaseUser, PermissionsMixin):
         else:
             self.delete()
 
+    def tokens(self):
+        refresh = RefreshToken.for_user(self)
+        return {
+            'refresh': str(refresh),
+            'access': str(refresh.access_token)
+        }
+    
 
 
 class Message(models.Model):
