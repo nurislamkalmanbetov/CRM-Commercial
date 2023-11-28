@@ -1,15 +1,11 @@
 from django.contrib.auth import authenticate, get_user_model
-from django.core.mail import send_mail
-from django.http import HttpResponse, Http404
 from django.utils import timezone
 from django_filters.rest_framework import DjangoFilterBackend
-from django.template.loader import render_to_string
 from drf_yasg2.utils import swagger_auto_schema
-from drf_yasg.utils import swagger_auto_schema
-from rest_framework import (exceptions, filters, generics, mixins, permissions,
-                            status, viewsets)
-from rest_framework.decorators import action
-from rest_framework.generics import GenericAPIView, ListAPIView, UpdateAPIView, CreateAPIView
+from rest_framework import (exceptions, filters, generics, mixins, status,
+                            viewsets)
+from rest_framework.generics import ListAPIView, CreateAPIView
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.response import Response
 from rest_framework.status import HTTP_201_CREATED
@@ -17,17 +13,13 @@ from rest_framework.views import APIView
 from rest_framework.viewsets import GenericViewSet
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView
-
-from .models import Profile
+from django.core.mail import send_mail
+from .models import Profile, SupportRequest, SupportResponse
 from .serializers import *
-from .serializers import UserLoginSerializer
-import uuid
-from django.http import FileResponse
-from .models import Profile
+from django.template.loader import render_to_string
 
 
 User = get_user_model()
-
 
 
 
@@ -39,76 +31,55 @@ class UserLoginView(generics.CreateAPIView):
         serializer.is_valid(raise_exception=True)
 
         try:
-            user = User.objects.get(email=serializer.validated_data['email'], password=serializer.validated_data['password'])
+            user = User.objects.get(email=serializer.validated_data['email'],password=serializer.validated_data['password'])
         except User.DoesNotExist:
             user = None
         if user is not None:
             refresh = RefreshToken.for_user(user)
-
-            # Отправка пароля на почту, если пользователь активен и студент
-            if user.is_student and user.is_active:
-                subject = 'Пароль для входа в систему'
-                message = f'Ваш пароль: {serializer.validated_data["password"]}'
-                from_email = 'noreply@example.com'  # Замените на ваш адрес электронной почты
-
-                recipient_list = [user.email]
-                send_mail(subject, message, from_email, recipient_list, fail_silently=False)
-
             return Response({
                 'message': 'Вход успешно выполнен',
                 'email': user.email,
+                'is_employer': user.is_employer,
+                'is_student': user.is_student,
+
                 'refresh_token': str(refresh),
                 'access_token': str(refresh.access_token)
+                
             })
         else:
             return Response({'message': 'Неверный логин или пароль'}, status=status.HTTP_401_UNAUTHORIZED)
+        
 
+
+
+
+class AdminCreateUserView(generics.CreateAPIView):
+    serializer_class = UserSerializer  # Замените на свой сериализатор пользователя
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            user = serializer.save()
+
+            # Отправка пароля на почту
+            password = request.data.get('password')
+            subject = 'Пароль для входа в систему'
+            message = f'Ваш пароль: {password}'
+            from_email = 'admin@example.com'  # Замените на адрес администратора
+
+            recipient_list = [user.email]
+
+            try:
+                send_mail(subject, message, from_email, recipient_list, fail_silently=False)
+            except Exception as e:
+                return Response({'message': 'Ошибка при отправке почты'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+            return Response({'message': 'Пользователь успешно создан и пароль отправлен на почту'}, status=status.HTTP_201_CREATED)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
-
-
-class PasswordResetRequestView(CreateAPIView):
-    serializer_class = PasswordResetRequestSerializer
-
-    def create(self, request, *args, **kwargs):
-        email = request.data.get('email')
-        user = User.objects.filter(email=email).first()
-        if user:
-            token = uuid.uuid4()
-            user.password_reset_token = str(token)
-            user.save()
-
-            # Подготовка и отправка письма
-            context = {
-                'reset_link': f'http://127.0.0.1:8001/password_reset_confirm/{token}/',
-                'token': token  # передаем токен в контекст для шаблона
-            }
-            html_content = render_to_string('email_templates/password_reset_email.html', context)
-            send_mail(
-                'Сброс пароля',
-                '',  # пустое тело для текстовой версии
-                'from@example.com',
-                [email],
-                fail_silently=False,
-                html_message=html_content
-            )
-        return Response({'detail': 'Если адрес электронной почты существует, ссылка для сброса пароля была отправлена.'})
-    
-
-class PasswordResetConfirmView(CreateAPIView):
-    serializer_class = PasswordResetConfirmSerializer
-
-    def create(self, request, *args, **kwargs):
-        token = kwargs.get('token')
-        password = request.data.get('password')
-        user = User.objects.filter(password_reset_token=token).first()
-        if user:
-            user.set_password(password)
-            user.password_reset_token = None  # очистить токен после его использования
-            user.save()
-            return Response({'detail': 'Пароль успешно обновлен.'})
-        return Response({'error': 'Неверный токен или он истек.'})
 
 
 class ProfileView(generics.CreateAPIView):
@@ -125,20 +96,26 @@ class ProfileView(generics.CreateAPIView):
         
         if not user.is_student:
             raise serializers.ValidationError({'detail': 'Вы не студент'})
-            
-        if user.is_student and not user.is_active:
-            raise serializers.ValidationError({'detail': 'Ваш профиль не активный'})
         
         serializer.save(user=user)
+
+        # Устанавливаем поле is_active пользователя в значение True
+        user.is_active = True
+        user.save()
             
     def post(self, request, *args, **kwargs):
         
         return self.create(request, *args, **kwargs)
 
+class ProfilePagination(PageNumberPagination):
+    page_size = 10
+    page_size_query_param = 'page_size'
+    max_page_size = 10000
 
 class ProfileListView(ListAPIView):
     queryset = Profile.objects.all()
     serializer_class = ProfileListSerializer
+    pagination_class = ProfilePagination
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     filterset_fields = ['user__email', 'german', 'english', 'turkish', 'russian', 'chinese','university__name_ru','faculty__name_ru', 'driver_license', 'driving_experience',]
 
@@ -153,6 +130,20 @@ class ProfileListViewSet(mixins.CreateModelMixin,
     serializer_class = ProfileListSerializer
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     filterset_fields = ['user__email', 'german', 'english', 'turkish', 'russian', 'chinese','university__name_ru','faculty__name_ru', 'driver_license', 'driving_experience',]
+
+
+
+class UserView(ListAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserListSerializer
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
+    filterset_fields = ['email']
+
+    
+class UserListView(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserListPutchSerializer
+    parser_classes = (MultiPartParser, FormParser)
 
 
 class SupportRequestListCreateView(generics.ListCreateAPIView):
@@ -184,83 +175,47 @@ class SupportResponseCreateView(generics.CreateAPIView):
             fail_silently=False,
         )
 
-
-class MessageListCreateView(generics.ListCreateAPIView):
-    queryset = Message.objects.all()
-    serializer_class = MessageSerializer
-    permission_classes = [permissions.IsAuthenticated]
-
-    def perform_create(self, serializer):
-        serializer.save(sender=self.request.user)
-
-
-class MessageRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Message.objects.all()
-    serializer_class = MessageSerializer
-    permission_classes = [permissions.IsAuthenticated]
-
-
-class AdminCreateUserView(generics.CreateAPIView):
-    serializer_class = UserSerializer  #  сериализатор пользователя
+class PasswordResetRequestView(CreateAPIView):
+    serializer_class = PasswordResetRequestSerializer
 
     def create(self, request, *args, **kwargs):
-        serializer = self.serializer_class(data=request.data)
-        if serializer.is_valid():
-            user = serializer.save()
+        email = request.data.get('email')
+        user = User.objects.filter(email=email).first()
+        if user:
+            token = uuid.uuid4()
+            user.password_reset_token = str(token)
+            user.save()
 
-            # Отправка пароля на почту
-            password = request.data.get('password')
-            subject = 'Пароль для входа в систему'
-            message = f'Ваш пароль: {password}'
-            from_email = 'admin@example.com'  # адрес администратора
-
-            recipient_list = [user.email]
-
-            try:
-                send_mail(subject, message, from_email, recipient_list, fail_silently=False)
-            except Exception as e:
-                return Response({'message': 'Ошибка при отправке почты'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-            return Response({'message': 'Пользователь успешно создан и пароль отправлен на почту'}, status=status.HTTP_201_CREATED)
-
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-class ProfileHistoryView(APIView):
-
-    serializer_class = ProfileHistorySerializer
-
-    def get(self, request):
-        profile_histories = ProfileHistory.objects.all()
-        serializer = self.serializer_class(profile_histories, many=True)
-        return Response(serializer.data)
-
-    @swagger_auto_schema(request_body=ProfileHistorySerializer)
-    def post(self, request):
-        serializer = self.serializer_class(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            # Подготовка и отправка письма
+            context = {
+                'reset_link': f'http://127.0.0.1:8005/password_reset_confirm/{token}/',
+                'token': token  # передаем токен в контекст для шаблона
+            }
+            html_content = render_to_string('password_reset_email.html', context)
+            send_mail(
+                'Сброс пароля',
+                '',  # пустое тело для текстовой версии
+                'from@example.com',
+                [email],
+                fail_silently=False,
+                html_message=html_content
+            )
+        return Response({'detail': 'Если адрес электронной почты существует, ссылка для сброса пароля была отправлена.'})
     
 
-class UserView(ListAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserListSerializer
-    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
-    filterset_fields = ['email']
+class PasswordResetConfirmView(CreateAPIView):
+    serializer_class = PasswordResetConfirmSerializer
 
-
-class UserListView(viewsets.ModelViewSet):
-    queryset = User.objects.all()
-    serializer_class = UserListPutchSerializer
-    parser_classes = (MultiPartParser, FormParser)
-
-
-class AnnouncementViewSet(viewsets.ModelViewSet):
-    queryset = Announcement.objects.all()
-    serializer_class = AnnouncementSerializer
-
+    def create(self, request, *args, **kwargs):
+        token = kwargs.get('token')
+        password = request.data.get('password')
+        user = User.objects.filter(password_reset_token=token).first()
+        if user:
+            user.set_password(password)
+            user.password_reset_token = None  # очистить токен после его использования
+            user.save()
+            return Response({'detail': 'Пароль успешно обновлен.'})
+        return Response({'error': 'Неверный токен или он истек.'})
 
 class ConnectionRequestListCreateView(generics.ListCreateAPIView):
     queryset = ConnectionRequest.objects.all()
@@ -269,43 +224,3 @@ class ConnectionRequestListCreateView(generics.ListCreateAPIView):
     def post(self, request, *args, **kwargs):
         """Создание новой заявки на подключение"""
         return self.create(request, *args, **kwargs)
-
-
-
-# В вашем файле views.py в приложении accounts или в новом приложении
-
-from rest_framework import generics
-from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.authentication import TokenAuthentication
-
-class MyView(generics.ListAPIView):
-    authentication_classes = (TokenAuthentication,)
-    permission_classes = (IsAuthenticated,)
-
-    def get(self, request, *args, **kwargs):
-        response = {
-            'message': 'Token works.'
-        }
-        return Response(response, status=200)
-
-
-# ___
-
-from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login
-from django.contrib import messages
-from .serializers import UserLoginSerializer
-
-def user_login(request):
-    if request.method == "POST":
-        serializer = UserLoginSerializer(data=request.POST)
-        if serializer.is_valid():
-            user = authenticate(email=serializer.validated_data['email'], password=serializer.validated_data['password'])
-            if user is not None:
-                login(request, user)
-                # Если у вас есть редирект после входа, измените его здесь
-                return redirect('common:home')
-            else:
-                messages.error(request, 'Неверный логин или пароль')
-    return render(request, 'accounts/login.html')

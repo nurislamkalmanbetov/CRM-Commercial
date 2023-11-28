@@ -1,56 +1,50 @@
 import datetime
 import json
 import uuid
-from smart_selects.db_fields import ChainedForeignKey
+from datetime import date, timedelta
 
+from applications.accounts.managers import (ProfileEssentialInfoManager,
+                                            ProfileInArchiveManager,
+                                            ProfileInEmbassyManager,
+                                            ProfileInInterviewManager,
+                                            ProfileInRegistrationManager,
+                                            ProfileInSendingManager,
+                                            ProfileInTerminManager,
+                                            ProfileInVacancyManager,
+                                            ProfileNotConfirmedManager,
+                                            ProfileRefusedManager,
+                                            StaffManager, UserManager)
+from applications.accounts.utils import user_directory_path
+from applications.core.models import (EmployerCompany, Faculty, ProfileCounter,
+                                      University, Vacancy)
+from django.contrib.admin.models import LogEntry
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.models import PermissionsMixin
+from django.core.exceptions import ValidationError
+from django.core.validators import validate_image_file_extension
 from django.db import models
+from django.utils import timezone
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from model_utils import FieldTracker
-from django.contrib.admin.models import LogEntry
-from django.core.validators import validate_image_file_extension
+from django.utils.translation import gettext_lazy as _
+from smart_selects.db_fields import ChainedForeignKey
 
-from applications.accounts.utils import user_directory_path
-from applications.accounts.managers import (
-    UserManager,
-    StaffManager,
-    ProfileInRegistrationManager,
-    ProfileInTerminManager,
-    ProfileNotConfirmedManager,
-    ProfileInInterviewManager,
-    ProfileInVacancyManager,
-    ProfileInEmbassyManager,
-    ProfileInSendingManager,
-    ProfileInArchiveManager,
-    ProfileEssentialInfoManager,
-    ProfileRefusedManager,
-)
-from applications.core.models import University, Faculty, ProfileCounter, EmployerCompany, Vacancy
-from django.conf import settings
-from datetime import date, timedelta
-from django.core.exceptions import ValidationError
-from rest_framework_simplejwt.tokens import RefreshToken
-
-
-
-AUTH_PROVIDERS = {'facebook': 'facebook', 'google': 'google', 'email': 'email'}
 
 class User(AbstractBaseUser, PermissionsMixin):
     avatar = models.ImageField(upload_to='user_avatar/', null=True, blank=True)
-    email = models.EmailField('Email адрес', unique=True, db_index=True)
-    phone = models.CharField('Номер телефона', max_length=50, blank=True, db_index=True)
-    whatsapp_phone = models.CharField('Номер Whatsapp', max_length=50, blank=True, db_index=True)
-    is_employer = models.BooleanField('Работадатель', default=False)
-    is_staff = models.BooleanField('Сотрудник', default=False)
-    is_student = models.BooleanField('Студент', default=False)
-    is_superuser = models.BooleanField('Суперпользователь', default=False)
-    is_active = models.BooleanField('Активен', default=True)
-    is_delete = models.BooleanField('Удален', default=False)
-    registered_at = models.DateTimeField('Дата регистрации', auto_now_add=True)
+    email = models.EmailField(_('Email адрес'), unique=True, db_index=True)
+    phone = models.CharField(_('Номер телефона'), max_length=50, blank=True, db_index=True)
+    whatsapp_phone = models.CharField(_('Номер Whatsapp'), max_length=50, blank=True, db_index=True)
+    is_employer = models.BooleanField(_('Работадатель'), default=False)
+    is_staff = models.BooleanField(_('Сотрудник'), default=False)
+    is_student = models.BooleanField(_('Студент'), default=False)
+    is_superuser = models.BooleanField(_('Суперпользователь'), default=False)
+    is_active = models.BooleanField(_('Активен'), default=False)
+    is_delete = models.BooleanField(_('Удален'), default=False)
+    registered_at = models.DateTimeField(_('Дата регистрации'), auto_now_add=True)
     password_reset_token = models.CharField(max_length=255, null=True, blank=True)
-    auth_provider = models.CharField(max_length=255, blank=False, null=False, default=AUTH_PROVIDERS.get('email'))
+    auth_provider = models.CharField(max_length=255, blank=False, null=False, default='email')
 
 
     USERNAME_FIELD = 'email'
@@ -59,12 +53,13 @@ class User(AbstractBaseUser, PermissionsMixin):
     objects = UserManager()
 
     def __str__(self):
-        return self.email   
+        return self.email
 
     def save(self, *args, **kwargs):
         if not self.email:
             raise ValueError('User must have an email')
-
+        # if self.pk is None:  # если это новый объект
+        #     self.set_password(self.password)
         super(User, self).save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):
@@ -73,42 +68,10 @@ class User(AbstractBaseUser, PermissionsMixin):
             self.save()
         else:
             self.delete()
-
-    def tokens(self):
-        refresh = RefreshToken.for_user(self)
-        return {
-            'refresh': str(refresh),
-            'access': str(refresh.access_token)
-        }
-    
-
-
-class Message(models.Model):
-    sender = models.ForeignKey(User,on_delete=models.CASCADE,related_name='sent_messages',
-        limit_choices_to=models.Q(is_active=True) & (models.Q(is_student=True) | models.Q(is_employer=True))
-    )
-    recipient = models.ForeignKey(User,on_delete=models.CASCADE,related_name='received_messages',
-        limit_choices_to=models.Q(is_active=True) & (models.Q(is_student=True) | models.Q(is_employer=True))
-    )
-    content = models.TextField('Сообщение')
-    timestamp = models.DateTimeField('Дата и время', auto_now_add=True)
-    
-    def __str__(self):
-        def get_role(user):
-            if user.is_employer:
-                return "работодатель"
-            elif user.is_student:
-                return "студент"
-            else:
-                return "неопределенная роль"
-
-        sender_role = get_role(self.sender)
-        recipient_role = get_role(self.recipient)
-
-        return f"От {self.sender.email} ({sender_role}) к {self.recipient.email} ({recipient_role}) в {self.timestamp}"
-
+            
     class Meta:
-        ordering = ['-timestamp']
+        verbose_name = _('Пользователь')
+        verbose_name_plural = _('Пользователи')
 
 
 def get_due_date():
@@ -123,12 +86,12 @@ def is_staff_or_superuser(user_id):
 
 class Payment(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='payments')
-    who_created = models.ForeignKey(User, on_delete=models.PROTECT, verbose_name='Оплату принял', related_name='payments_received', validators=[is_staff_or_superuser])
-    amount_paid = models.DecimalField('Оплачено', max_digits=10, decimal_places=2, default=0)
-    remaining_amount = models.DecimalField('Остаток', max_digits=10, decimal_places=2, editable=False, default=35000)
-    is_fully_paid = models.BooleanField('Оплачено полностью', default=False)
-    payment_date = models.DateField('Дата оплаты', auto_now_add=True)
-    due_date = models.DateField('Крайний срок оплаты', default=get_due_date, null=True)
+    who_created = models.ForeignKey(User, on_delete=models.PROTECT, verbose_name=_('Оплату принял'), related_name='payments_received', validators=[is_staff_or_superuser])
+    amount_paid = models.DecimalField(_('Оплачено'), max_digits=10, decimal_places=2, default=0)
+    remaining_amount = models.DecimalField(_('Остаток'), max_digits=10, decimal_places=2, editable=False, default=35000)
+    is_fully_paid = models.BooleanField(_('Оплачено полностью'), default=False)
+    payment_date = models.DateField(_('Дата оплаты'), auto_now_add=True)
+    due_date = models.DateField(_('Крайний срок оплаты'), default=get_due_date, null=True)
 
     def __str__(self):
         return f"ID: {self.id} {self.user.email} Оплачено: {self.amount_paid} Остаток: {self.remaining_amount}"
@@ -148,36 +111,8 @@ class Payment(models.Model):
         super(Payment, self).save(*args, **kwargs)
 
     class Meta:
-        verbose_name = 'Платеж студента'
-        verbose_name_plural = 'Платежи студентов'
-
-
-class SupportRequest(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Пользователь')
-    message = models.TextField('Сообщение')
-    created_at = models.DateTimeField('Дата создания', auto_now_add=True)
-
-    def str(self):
-        return f"Запрос от {self.user.email}: {self.created_at}"
-    
-    class Meta:
-        verbose_name = 'Тех поддержка'
-        verbose_name_plural = 'Тех поддержка'
-
-
-class SupportResponse(models.Model):
-    support_request = models.ForeignKey(SupportRequest, on_delete=models.CASCADE, related_name='response')
-    message = models.TextField('Ответ')
-    created_at = models.DateTimeField('Дата создания', auto_now_add=True)
-    sent = models.BooleanField('Отправлено', default=False)
-    
-    def save(self, *args, **kwargs):
-        self.sent = True
-        super(SupportResponse, self).save(*args, **kwargs)
-    
-
-    def str(self):
-        return f"Ответ к запросу {self.support_request.id}"
+        verbose_name = _('Платеж студента')
+        verbose_name_plural = _('Платежи студентов')
 
 
 class Staff(User):
@@ -185,159 +120,161 @@ class Staff(User):
 
     class Meta:
         proxy = True
-        verbose_name = 'сотрудник'
-        verbose_name_plural = 'сотрудники'
+        verbose_name = _('сотрудник')
+        verbose_name_plural = _('сотрудники')
 
 
 class Profile(models.Model):
 
     GENDER_CHOICES = (
-        ('Мужской', 'Мужской'),
-        ('Женский', 'Женский'),
+        ("M", _("Мужской")),
+        ("F", _("Женский")),
     )
 
     NATIONALITY_CHOICES = (
-        ('Kirgisistan', 'Кыргызстан'),
-        ('Kazakhistan', 'Казахстан'),
-        ('Uzbekistan', 'Узбекистан'),
-        ('Tadzhikistan', 'Таджикистан'),
-        ('Russland', 'Россия'),
-        ('andere', 'другое'),
+        ('Кыргызстан', _('Кыргызстан')),
+        ('Казахстан', _('Казахстан')),
+        ('Узбекистан', _('Узбекистан')),
+        ('Таджикистан', _('Таджикистан')),
+        ('Россия', _('Россия')),
+        ('другое', _('другое')),
     )
 
     COUNTRY_CHOICES = (
-        ('Kirgisistan', 'Кыргызстан'),
-        ('Kazakhistan', 'Казахстан'),
-        ('Uzbekistan', 'Узбекистан'),
-        ('Tadzhikistan', 'Таджикистан'),
-        ('Russland', 'Россия'),
-        ('Türkei', 'Турция'),
+        ('Кыргызстан', _('Кыргызстан')),
+        ('Казахстан', _('Казахстан')),
+        ('Узбекистан', _('Узбекистан')),
+        ('Таджикистан', _('Таджикистан')),
+        ('Россия', _('Россия')),
+        ('Türkei', _('Турция')),
     )
 
     REGION_CHOICES = (
-        ('Tschui', 'Чуйская область'),
-        ('Naryn', 'Нарынская область'),
-        ('Talas', 'Таласская область'),
-        ('Issik-Kul', 'Ыссык-Кульская область'),
-        ('Zhalal-Abad', 'Жалал-Абадская область'),
-        ('Osh', 'Ошская область'),
-        ('Batken', 'Баткенская область'),
+        ("Tschui", _("Чуйская область")),
+        ("Naryn", _("Нарынская область")),
+        ("Talas", _("Таласская область")),
+        ("Issik-Kul", _("Ыссык-Кульская область")),
+        ("Zhalal-Abad", _("Жалал-Абадская область")),
+        ("Osh", _("Ошская область")),
+        ("Batken", _("Баткенская область")),
     )
 
     REGION_CHOICES_RU = (
-        ('Чуйская область', 'Чуйская область'),
-        ('Нарынская область', 'Нарынская область'),
-        ('Таласская область', 'Таласская область'),
-        ('Ыссык-Кульская область', 'Ыссык-Кульская область'),
-        ('Жалал-Абадская область', 'Жалал-Абадская область'),
-        ('Ошская область', 'Ошская область'),
-        ('Баткенская область', 'Баткенская область'),
+        ("Чуйская область", _("Чуйская область")),
+        ("Нарынская область", _("Нарынская область")),
+        ("Таласская область", _("Таласская область")),
+        ("Ыссык-Кульская область", _("Ыссык-Кульская область")),
+        ("Жалал-Абадская область", _("Жалал-Абадская область")),
+        ("Ошская область", _("Ошская область")),
+        ("Баткенская область", _("Баткенская область")),
     )
 
     DEGREE_CHOICES = (
-        ('бакалавр', 'Бакалавр'),
-        ('магистр', 'Магистр'),
-        ('колледж', 'Колледж'),
+        ("бакалавр", _("Бакалавр")),
+        ("магистр", _("Магистр")),
+        ("колледж", _("Колледж")),
     )
 
     YEAR_CHOICES = [(i, i) for i in range(1, 6)]
 
     POSITION_CHOICES = (
-        ('Kellner', 'Официант'),
-        ('Verkäufer', 'Продавец'),
-        ('Kassierer', 'Кассир'),
-        ('Küchenhelfer', 'Кух. работник'),
-        ('Zimmermädchen', 'Горничная'),
-        ('Rezeptionist', 'Ресепшн'),
-        ('Lager', 'Грузчик'),
-        ('Taxifahrer', 'Таксист'),
-        ('Lehrer', 'Преподаватель'),
-        ('Kinderfrau', 'Няня'),
-        ('Bote', 'Курьер'),
-        ('Sekretär', 'Секретарь'),
-        ('Feldarbeiter', 'Работа на полях'),
-        ('Call-Center-Betreiber', 'Оператор call-центра'),
-        ('Wächter', 'Охранник'),
-        ('Promoter', 'Промоутер'),
-        ('Barmann', 'Бармен'),
-        ('Reiseführer', 'Гид'),
-        ('Animateur', 'Аниматор'),
-        ('Tankwagen', 'Заправщик'),
-        ('Verwalter', 'Администратор'),
-        ('Packer', 'Упаковщик'),
-        ('Nähwerkarbeiter', 'Работа в швейном цеху'),
-        ('Putzfrau', 'Уборщица'),
-        ('Hirt', 'Пастух'),
-        ('Bauernarbeiter', 'Работа на фермах'),
-        ('Sanitäter', 'Санитар'),
-        ('Bauarbeiter', 'Строитель'),
-        ('Visagist', 'Визажист'),
-        ('Designer', 'Дизайнер'),
-        ('Haushälterin', 'Домохозяйка'),
-        ('Lagerverwalter', 'Кладовщик'),
-        ('Absatzforscher', 'Маркетолог'),
-        ('Masseur', 'Массажист'),
-        ('Möbelbauer', 'Мебельщик'),
-        ('Krankenpfleger', 'Медбрат'),
-        ('Krankenschwester', 'Медсестра'),
-        ('Manager', 'Мэнеджер'),
-        ('Monteur', 'Монтёр'),
-        ('Operator', 'Оператор'),
-        ('Finisher', 'Отделочник'),
-        ('Friseur', 'Парикмахер'),
-        ('Übersetzer', 'Переводчик'),
-        ('Koch', 'Повар'),
-        ('Geschirrspüler', 'Посудомойщик'),
-        ('Briefträger', 'Почтальон'),
-        ('Wäscherin', 'Прачка'),
-        ('Lagerarbeiter', 'Работа на складах'),
-        ('Hilfsarbeiter', 'Разнорабочий'),
-        ('Installateur', 'Сантехник'),
-        ('Schweißer', 'Сварщик'),
-        ('Krankenpflegerin', 'Сиделка'),
-        ('Handelsvertreter', 'Торговый агент'),
-        ('Trainer', 'Тренер'),
-        ('Raumpfleger', 'Уборщик'),
-        ('Fotograf', 'Фотограф'),
-        ('Choreograph', 'Хореограф'),
-        ('Elektriker', 'Электрик'),
+        ("Kellner", _("Официант")),
+        ("Verkäufer", _("Продавец")),
+        ("Kassierer", _("Кассир")),
+        ("Küchenhelfer", _("Кух. работник")),
+        ("Zimmermädchen", _("Горничная")),
+        ("Rezeptionist", _("Ресепшн")),
+        ("Lager", _("Грузчик")),
+        ("Taxifahrer", _("Таксист")),
+        ("Lehrer", _("Преподаватель")),
+        ("Kinderfrau", _("Няня")),
+        ("Bote", _("Курьер")),
+        ("Sekretär", _("Секретарь")),
+        ("Feldarbeiter", _("Работа на полях")),
+        ("Call-Center-Betreiber", _("Оператор call-центра")),
+        ("Wächter", _("Охранник")),
+        ("Promoter", _("Промоутер")),
+        ("Barmann", _("Бармен")),
+        ("Reiseführer", _("Гид")),
+        ("Animateur", _("Аниматор")),
+        ("Tankwagen", _("Заправщик")),
+        ("Verwalter", _("Администратор")),
+        ("Packer", _("Упаковщик")),
+        ("Nähwerkarbeiter", _("Работа в швейном цеху")),
+        ("Putzfrau", _("Уборщица")),
+        ("Hirt", _("Пастух")),
+        ("Bauernarbeiter", _("Работа на фермах")),
+        ("Sanitäter", _("Санитар")),
+        ("Bauarbeiter", _("Строитель")),
+        ("Visagist", _("Визажист")),
+        ("Designer", _("Дизайнер")),
+        ("Haushälterin", _("Домохозяйка")),
+        ("Lagerverwalter", _("Кладовщик")),
+        ("Absatzforscher", _("Маркетолог")),
+        ("Masseur", _("Массажист")),
+        ("Möbelbauer", _("Мебельщик")),
+        ("Krankenpfleger", _("Медбрат")),
+        ("Krankenschwester", _("Медсестра")),
+        ("Manager", _("Мэнеджер")),
+        ("Monteur", _("Монтёр")),
+        ("Operator", _("Оператор")),
+        ("Finisher", _("Отделочник")),
+        ("Friseur", _("Парикмахер")),
+        ("Übersetzer", _("Переводчик")),
+        ("Koch", _("Повар")),
+        ("Geschirrspüler", _("Посудомойщик")),
+        ("Briefträger",_("Почтальон")),
+        ("Wäscherin", _("Прачка")),
+        ("Lagerarbeiter", _("Работа на складах")),
+        ("Hilfsarbeiter", _("Разнорабочий")),
+        ("Installateur", _("Сантехник")),
+        ("Schweißer", _("Сварщик")),
+        ("Krankenpflegerin", _("Сиделка")),
+        ("Handelsvertreter", _("Торговый агент")),
+        ("Trainer", _("Тренер")),
+        ("Raumpfleger", _("Уборщик")),
+        ("Fotograf", _("Фотограф")),
+        ("Choreograph", _("Хореограф")),
+        ("Elektriker", _("Хореограф")),
     )
 
     WORK_COUNTRY_CHOICES = (
-        ('Kirgisistan', 'Кыргызстан'),
-        ('Russland', 'Россия'),
-        ('Türkei', 'Турция'),
-        ('Kazakhistan', 'Казахстан'),
-        ('Deutschland', 'Германия'),
-        ('Uzbekistan', 'Узбекистан'),
-        ('Tadzhikistan', 'Таджикистан'),
-        ('Dubai', 'Дубай'),
-        ('USA', 'Америка'),
-        ('andere', 'другое'),
+        ('Кыргызстан', _('Кыргызстан')),
+        ('Россия', _('Россия')),
+        ('Турция', _('Турция')),
+        ('Казахстан', _('Казахстан')),
+        ('Германия', _('Германия')),
+        ('Узбекистан', _('Узбекистан')),
+        ('Таджикистан', _('Таджикистан')),
+        ('Дубай', _('Дубай')),
+        ('USA', _('Америка')),
+        ('другое', _('другое')),
     )
 
     LANGUAGE_LEVEL_CHOICES = (
-            ('C2', 'В совершенстве'),
-            ('C1', 'Очень хорошо'),
-            ('B2', 'Хорошо'),
-            ('B1', 'Разговорный'),
-            ('A2', 'Обучаюсь'),
-            ('A1', 'Начальный'),
-            ('0', 'Не знаю'),
-    )
+        ('C2', _('В совершенстве')),
+        ('C1', _('Очень хорошо')),
+        ('B2', _('Хорошо')),
+        ('B1', _('Разговорный')),
+        ('A2', _('Обучаюсь')),
+        ('A1', _('Начальный')),
+        ('0', _('Не знаю')),
+)
+
+
 
     DRIVING_EXPERIENCE_CHOICES = (
-        ('1', 'до 1 года'),
-        ('2', '1 год'),
-        ('3', '2 года'),
-        ('4', '3 года'),
-        ('5', '4 и более лет'),
+        ("1", _("до 1 года")),
+        ("2", _("1 год")),
+        ("3", _("2 года")),
+        ("4", _("3 года")),
+        ("5", _("4 и более лет")),
     )
 
     TRANSMISSION_CHOICES = (
-        ('1', 'Механика'),
-        ('2', 'Автомат'),
-        ('3', 'Механика и автомат'),
+        ("1", _("Механика")),
+        ("2", _("Автомат")),
+        ("3", _("Механика и автомат")),
     )
 
     SHIRT_SIZE_CHOICES = (
@@ -354,93 +291,107 @@ class Profile(models.Model):
 
     LEVEL_CHOICES = (
         ('a0', 'A0'),
-        ('a1-', 'A1-'),
         ('a1', 'A1'),
         ('a1+', 'A1+'),
-        ('a2-', 'A2-'),
         ('a2', 'A2'),
         ('a2+', 'A2+'),
-        ('b1-', 'B1-'),
         ('b1', 'B1'),
         ('b1+', 'B1+'),
-        ('b2-', 'B2-'),
         ('b2', 'B2'),
         ('b2+', 'B2+'),
         ('c1', 'C1'),
     )
 
     BICYCLE_SKILL_CHOICES = (
-        ('ride_good', 'Да, отлично'),
-        ('ride_bad', 'Да, но плохо'),
-        ('cant_ride', 'Нет, не умею'),
+        ("ride_good", _("Да, отлично")),
+        ("ride_bad", _("Да, но плохо")),
+        ("cant_ride", _("Нет, не умею")),
     )
 
     ACCOMODATION_TYPE_CHOICES = (
-        ('student', 'Студент'),
-        ('employer', 'Работодатель'),
+        ("student", _("Студент")),
+        ("employer", _("Работодатель")),
     )
 
     EMBASSY_VISAMETRIC_CHOICES = (
-        ('embassy', 'Посольство'),
-        ('visametric', 'Визаметрик'),
+        ("embassy", _("Посольство")),
+        ("visametric", _("Визаметрик")),
     )
 
     MARSHRUT_CHOICES = (
-        ('not_exist', 'Нет маршрута'),
-        ('doubtful', 'Сомнительно'),
-        ('created', 'Маршрут был составлен'),
-        ('received', 'Маршрут был получен'),
+        ("not_exist", _("Нет маршрута")),
+        ("doubtful", _("Сомнительно")),
+        ("created", _("Маршрут был составлен")),
+        ("received", _("Маршрут был получен")),
     )
 
     DOMKOM_DOC_CHOICES = (
-        ('not_exist', 'Нет'),
-        ('brought', 'Принес'),
-        ('sent', 'Отправили в Германию'),
-        ('not_given', 'Не дали'),
+        ("not_exist", _("Нет")),
+        ("brought", _("Принес")),
+        ("sent", _("Отправили в Германию")),
+        ("not_given", _("Не дали")),
     )
 
     BILET_DOC_CHOICES = (
-        ('not_exist', 'Нет'),
-        ('brought', 'Принес'),
-        ('sent', 'Отправили в Германию'),
-        ('not_given', 'Не смог получить (сомнительно)'),
+        ("not_exist", _("Нет")),
+        ("brought", _("Принес")),
+        ("sent", _("Отправили в Германию")),
+        ("not_given", _("Не смог получить (сомнительно)")),
     )
     DIRECTION_CHOICES = (
         ('nord', 'Nord'),
         ('sud', 'Süd')
     )
 
-    user = models.OneToOneField(User, models.CASCADE)
-    photo = models.ImageField('Фотография', blank=True, null=True)
+    user = models.OneToOneField(User, models.CASCADE, related_name='profile')
+    photo = models.ImageField(_('Фотография'),upload_to='media/profile', blank=True, null=True)
     # main questionnaire confirmation
-    is_confirmed = models.BooleanField('Подтвержден пользователем', default=False)
-    is_form_completed = models.BooleanField('Статус заполнения формы', default=False)
-    is_admin_confirmed = models.BooleanField('Подтверждено админом', default=False)
-    access_to_registration_documents = models.BooleanField('Доступ к справкам для регистрации', default=False)
-    access_to_embassy_documents = models.BooleanField('Доступ к справкам для посольства', default=False)
-    start_vise_date = models.DateField('Дата начала действия визы', blank=True, default=None, null=True)
-    end_vise_date = models.DateField('Дата окончания действия визы', blank=True, default=None, null=True)
-    level = models.CharField('Уровень', choices=LEVEL_CHOICES, max_length=3, default='', blank=True)
-    courses_info = models.TextField('Курсы', default='', blank=True)
+    is_confirmed = models.BooleanField(_('Подтвержден пользователем'), default=False)
+    is_form_completed = models.BooleanField(_('Статус заполнения формы'), default=False)
+    is_admin_confirmed = models.BooleanField(_('Подтверждено админом'), default=False)
+    access_to_registration_documents = models.BooleanField(_('Доступ к справкам для регистрации'), default=False)
+    access_to_embassy_documents = models.BooleanField(_('Доступ к справкам для посольства'), default=False)
+    start_vise_date = models.DateField(_('Дата начала действия визы'), blank=True, default=None, null=True)
+    end_vise_date = models.DateField(_('Дата окончания действия визы'), blank=True, default=None, null=True)
+    level = models.CharField(
+        _("Уровень"), choices=LEVEL_CHOICES, max_length=20, default="", blank=True
+    )
+    courses_info = models.TextField(_("Курсы"), default="", blank=True)
     creation_date = models.DateTimeField(auto_now_add=True, blank=True, null=True)
 
-    comment = models.TextField('Комментарий', default='', blank=True)
-    note = models.CharField('Заметка', default='', blank=True, max_length=255)
-    
+    comment = models.TextField(_("Комментарий"), default="", blank=True)
+    note = models.CharField(_("Заметка"), default="", blank=True, max_length=255)
+
     # personal info
-    first_name = models.CharField('Имя на латинице', max_length=255, default='', blank=True)
-    first_name_ru = models.CharField('Имя на кириллице', max_length=255, default='', blank=True)
-    last_name = models.CharField('Фамилия на латинице', max_length=255, default='', blank=True)
-    last_name_ru = models.CharField('Фамилия на кирилице', max_length=255, default='', blank=True)
-    gender = models.CharField('Пол', choices=GENDER_CHOICES, max_length=10, default='', blank=True)
-    bday = models.DateField('День рождения', null=True, blank=True)
-    nationality = models.CharField('Гражданство', choices=NATIONALITY_CHOICES, max_length=50, default='', blank=True)
-    been_to_germany = models.BooleanField('Был в Германии', blank=True, null=True)
+    first_name = models.CharField(
+        _("Имя на латинице"), max_length=255, default="", blank=True
+    )
+    first_name_ru = models.CharField(
+        _("Имя на кириллице"), max_length=255, default="", blank=True
+    )
+    last_name = models.CharField(
+        _("Фамилия на латинице"), max_length=255, default="", blank=True
+    )
+    last_name_ru = models.CharField(
+        _("Фамилия на кирилице"), max_length=255, default="", blank=True
+    )
+    gender = models.CharField(
+        _("Пол"), choices=GENDER_CHOICES, max_length=20, default="", blank=True
+    )
+    bday = models.DateField(_("День рождения"), null=True, blank=True)
+    nationality = models.CharField(
+        _("Гражданство"),
+        choices=NATIONALITY_CHOICES,
+        max_length=50,
+        default="",
+        blank=True,
+    )
+    been_to_germany = models.BooleanField(_("Был в Германии"), blank=True, null=True)
 
     # birth place
-    birth_country = models.CharField('Страна рождения', choices=COUNTRY_CHOICES, max_length=50, default='', blank=True)
-    birth_region = models.CharField('Область рождения', choices=REGION_CHOICES, max_length=50, default='', blank=True)
-    birth_city = models.CharField('Город/cело рождения', max_length=255, default='', blank=True)
+    birth_country = models.CharField(_('Страна рождения'), choices=COUNTRY_CHOICES, max_length=50, default='', blank=True)
+    birth_region = models.CharField(_('Область рождения'), choices=REGION_CHOICES, max_length=50, default='', blank=True)
+    birth_city = models.CharField(_('Город/cело рождения'), max_length=255, default='', blank=True)
 
     # place of residence
     reg_region = models.CharField('Область (адрес прописки)', choices=REGION_CHOICES_RU, max_length=50, default='', blank=True)
@@ -451,7 +402,7 @@ class Profile(models.Model):
     reg_street = models.CharField('Улица или микрорайон на русском (адрес прописки)', max_length=500, default='', blank=True)
     reg_street_en = models.CharField('Улица или микрорайон на латинице (адрес прописки)', max_length=500, default='', blank=True)
     reg_house = models.CharField('Дом (адрес прописки)', max_length=255, default='', blank=True)
-    reg_apartment = models.CharField('Квартира (адрес прописки)', max_length=255, default='', blank=True)
+    reg_apartment = models.CharField(_('Квартира (адрес прописки)'), max_length=255, default='', blank=True)
 
     # actual address
     live_region = models.CharField('Область (фактический адрес)', choices=REGION_CHOICES_RU, max_length=50, default='', blank=True)
@@ -470,15 +421,15 @@ class Profile(models.Model):
     zagranpassport_end_time = models.DateField('Дата окончания загранпаспорта', blank=True, null=True)
 
     # education info
-    university = models.ForeignKey(University, on_delete=models.SET_NULL, verbose_name='Университет', related_name='students', blank=True, null=True)
-    faculty = models.ForeignKey(Faculty, on_delete=models.SET_NULL, verbose_name='Факультет', related_name='students', blank=True, null=True)
+    university = models.ForeignKey(University, on_delete=models.SET_NULL, verbose_name=_('Университет'), related_name='students', blank=True, null=True)
+    faculty = models.ForeignKey(Faculty, on_delete=models.SET_NULL, verbose_name=_('Факультет'), related_name='students', blank=True, null=True)
     degree = models.CharField('Академическая степень', choices=DEGREE_CHOICES, max_length=20, default='', blank=True)
     year = models.IntegerField('Курс', choices=YEAR_CHOICES, blank=True, null=True)
-    study_start = models.DateField('Дата поступления', blank=True, null=True)
-    study_end = models.DateField('Дата окончания', blank=True, null=True)
+    study_start = models.DateField(_('Дата поступления'), blank=True, null=True)
+    study_end = models.DateField(_('Дата окончания'), blank=True, null=True)
     summer_holidays_start = models.DateField('Дата начала каникул', blank=True, null=True)
     summer_holidays_end = models.DateField('Дата окончания каникул', blank=True, null=True)
-    direction = models.CharField('Направление', max_length=50, blank=True, null=True, choices=DIRECTION_CHOICES)
+    direction = models.CharField(_('Направление'), max_length=50, blank=True, null=True, choices=DIRECTION_CHOICES)
 
     # parents info
     father_phone = models.CharField('Контактный номер отца', max_length=50, blank=True, db_index=True)
@@ -512,22 +463,22 @@ class Profile(models.Model):
     country3 = models.CharField('Страна (3 место работы)', choices=WORK_COUNTRY_CHOICES, max_length=50, default='', blank=True)
 
     # languages info
-    german = models.CharField('Знание немецкого языка', choices=LANGUAGE_LEVEL_CHOICES, max_length=10, default='', blank=True)
-    english = models.CharField('Знание английского языка', choices=LANGUAGE_LEVEL_CHOICES, max_length=10, default='', blank=True)
-    turkish = models.CharField('Знание турецкого языка', choices=LANGUAGE_LEVEL_CHOICES, max_length=10, default='', blank=True)
-    russian = models.CharField('Знание русского языка', choices=LANGUAGE_LEVEL_CHOICES, max_length=10, default='', blank=True)
-    chinese = models.CharField('Знание китайского языка', choices=LANGUAGE_LEVEL_CHOICES, max_length=10, default='', blank=True)
+    german = models.CharField(_('Знание немецкого языка'), choices=LANGUAGE_LEVEL_CHOICES, max_length=150, default='', blank=True)
+    english = models.CharField(_('Знание английского языка'), choices=LANGUAGE_LEVEL_CHOICES, max_length=150, default='', blank=True)
+    turkish = models.CharField(_('Знание турецкого языка'), choices=LANGUAGE_LEVEL_CHOICES, max_length=150, default='', blank=True)
+    russian = models.CharField(_('Знание русского языка'), choices=LANGUAGE_LEVEL_CHOICES, max_length=150, default='', blank=True)
+    chinese = models.CharField(_('Знание китайского языка'), choices=LANGUAGE_LEVEL_CHOICES, max_length=150, default='', blank=True)
 
     # driver license
-    driver_license = models.BooleanField('Водительские права', default=False)
-    driving_experience = models.CharField('Стаж вождения', choices=DRIVING_EXPERIENCE_CHOICES, max_length=1, default='', blank=True)
-    cat_a = models.BooleanField('Категория A', default=False)
-    cat_b = models.BooleanField('Категория B', default=False)
-    cat_c = models.BooleanField('Категория C', default=False)
-    cat_d = models.BooleanField('Категория D', default=False)
-    cat_e = models.BooleanField('Категория E', default=False)
-    tractor = models.BooleanField('Трактор', default=False)
-    transmission = models.CharField('Коробка передач', choices=TRANSMISSION_CHOICES, max_length=1, default='', blank=True)
+    driver_license = models.BooleanField(_('Водительские права'), default=False)
+    driving_experience = models.CharField(_('Стаж вождения'), choices=DRIVING_EXPERIENCE_CHOICES, max_length=1, default='', blank=True)
+    cat_a = models.BooleanField(_("Категория A"), default=False)
+    cat_b = models.BooleanField(_("Категория B"), default=False)
+    cat_c = models.BooleanField(_("Категория C"), default=False)
+    cat_d = models.BooleanField(_("Категория D"), default=False)
+    cat_e = models.BooleanField(_("Категория E"), default=False)
+    tractor = models.BooleanField(_('Трактор'), default=False)
+    transmission = models.CharField(_('Коробка передач'), choices=TRANSMISSION_CHOICES, max_length=1, default='', blank=True)
 
     # bicycle skills
     bicycle_skill = models.CharField('Умение кататься на велосипеде', choices=BICYCLE_SKILL_CHOICES, max_length=10, default='', blank=True)
@@ -538,21 +489,21 @@ class Profile(models.Model):
     shoe_size = models.IntegerField('Размер обуви', choices=SHOE_SIZE_CHOICES, blank=True, null=True)
 
     # hobbies
-    reading = models.BooleanField('Чтение', default=False)
-    singing = models.BooleanField('Пение', default=False)
-    travelling = models.BooleanField('Путешествие', default=False)
-    yoga = models.BooleanField('Йога', default=False)
-    dancing = models.BooleanField('Танцы', default=False)
-    sport = models.BooleanField('Спорт', default=False)
-    drawing = models.BooleanField('Рисование', default=False)
-    computer_games = models.BooleanField('Компьютерные игры', default=False)
-    guitar = models.BooleanField('Игра на гитаре', default=False)
-    films = models.BooleanField('Фильмы', default=False)
-    music = models.BooleanField('Музыка', default=False)
-    knitting = models.BooleanField('Вязание', default=False)
-    cooking = models.BooleanField('Готовка', default=False)
-    fishing = models.BooleanField('Рыбалка', default=False)
-    photographing = models.BooleanField('Фотография', default=False)
+    reading = models.BooleanField(_("Чтение"), default=False)
+    singing = models.BooleanField(_("Пение"), default=False)
+    travelling = models.BooleanField(_("Путешествие"), default=False)
+    yoga = models.BooleanField(_("Йога"), default=False)
+    dancing = models.BooleanField(_("Танцы"), default=False)
+    sport = models.BooleanField(_("Спорт"), default=False)
+    drawing = models.BooleanField(_("Рисование"), default=False)
+    computer_games = models.BooleanField(_("Компьютерные игры"), default=False)
+    guitar = models.BooleanField(_("Игра на гитаре"), default=False)
+    films = models.BooleanField(_("Фильмы"), default=False)
+    music = models.BooleanField(_("Музыка"), default=False)
+    knitting = models.BooleanField(_("Вязание"), default=False)
+    cooking = models.BooleanField(_("Готовка"), default=False)
+    fishing = models.BooleanField(_("Рыбалка"), default=False)
+    photographing = models.BooleanField(_("Фотография"), default=False)
 
     # documents to upload
     study_certificate = models.FileField('Справка с места учебы', upload_to=user_directory_path, blank=True)
@@ -1014,48 +965,37 @@ class Profile(models.Model):
         return region_dict.get(region_ru)
 
     class Meta:
+        verbose_name = _('Профиль студента')
+        verbose_name_plural = _('Профили студентов')
+
         ordering = ['last_name', 'first_name', '-creation_date']
+
+class Contacts(Profile):
+    class Meta:
+        proxy = True
+        verbose_name = _("Контакт студента")
+        verbose_name_plural = _("Контакты студентов")
 
 
 class StudentDocumentsProfileProxy(Profile):
     class Meta:
         proxy = True
-        verbose_name = "Документ Студента"
-        verbose_name_plural = "Документы Студентов"
-
-
-
-class Announcement(models.Model):
-    title = models.CharField(max_length=100)
-    content = models.TextField(blank=True, null=True)
-    photo = models.ImageField(upload_to='announcements/', blank=True, null=True)
-    video = models.URLField(blank=True, null=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    send_to_students = models.BooleanField(default=False, verbose_name='Отправить студентам')
-    send_to_employers = models.BooleanField(default=False, verbose_name='Отправить работодателям')
-
-    class Meta:
-        verbose_name = 'Объявление'
-        verbose_name_plural = 'Объявления'
-
-    def __str__(self):
-        return self.title
-
+        verbose_name = _("Документ Студента")
+        verbose_name_plural = _("Документы Студентов")
 
 
 class Interview(models.Model):
     INVITED_STATUS_CHOICES = (
-        ('not_invited', 'Не оповестили'),
-        ('doubtful', 'Сомнительно'),
-        ('invited', 'Оповестили'),
-        ('invited_twice', 'Оповестили дважды'),
+        ("not_invited", _("Не оповестили")),
+        ("doubtful", _("Сомнительно")),
+        ("invited", _("Оповестили")),
+        ("invited_twice", _("Оповестили дважды")),
     )
-    profile = models.ForeignKey(Profile, verbose_name='Пользователь', related_name='interviews', on_delete=models.CASCADE)
-    company = models.ForeignKey(EmployerCompany, verbose_name='Работодатель', related_name='interviews', on_delete=models.CASCADE, null=True)
+    profile = models.ForeignKey(Profile, verbose_name=_('Пользователь'), related_name='interviews', on_delete=models.CASCADE)
+    company = models.ForeignKey(EmployerCompany, verbose_name=_('Работодатель'), related_name='interviews', on_delete=models.CASCADE, null=True)
     vacancy = ChainedForeignKey(
         Vacancy,
-        verbose_name='Вакансия',
+        verbose_name=_('Вакансия'),
         related_name='interviews',
         on_delete=models.SET_NULL,
         null=True,
@@ -1065,18 +1005,18 @@ class Interview(models.Model):
         auto_choose=True,
         sort=True,
     )
-    city = models.CharField('Город', max_length=255, blank=True)
-    invited_status = models.CharField('Приглашен', max_length=50, choices=INVITED_STATUS_CHOICES, default='not_invited')
-    invite_date = models.DateField('Дата оповещения', blank=True, null=True)
-    student_confirm = models.BooleanField('Подтверждение студента', default=False)
-    vacancy_confirm = models.BooleanField('Прошел на вакансию', default=False)
-    appointment_date = models.DateTimeField('Дата и время собеседования', blank=True, null=True)
-    work_from = models.DateField('Дата начала работы', blank=True, null=True)
-    work_to = models.DateField('Дата окончания работы', blank=True, null=True)
+    city = models.CharField(_('Город'), max_length=255, blank=True)
+    invited_status = models.CharField(_('Приглашен'), max_length=50, choices=INVITED_STATUS_CHOICES, default='not_invited')
+    invite_date = models.DateField(_('Дата оповещения'), blank=True, null=True)
+    student_confirm = models.BooleanField(_('Подтверждение студента'), default=False)
+    vacancy_confirm = models.BooleanField(_('Прошел на вакансию'), default=False)
+    appointment_date = models.DateTimeField(_('Дата и время собеседования'), blank=True, null=True)
+    work_from = models.DateField(_('Дата начала работы'), blank=True, null=True)
+    work_to = models.DateField(_('Дата окончания работы'), blank=True, null=True)
 
     class Meta:
-        verbose_name = 'Собеседование'
-        verbose_name_plural = 'Собеседования'
+        verbose_name = _('Собеседование')
+        verbose_name_plural = _('Собеседования')
 
     def __str__(self):
         return self.profile.full_name_reverse + f'{self.appointment_date}'
@@ -1113,9 +1053,17 @@ class ProfileNotConfirmed(Profile):
 
     class Meta:
         proxy = True
-        verbose_name = 'Общий список'
-        verbose_name_plural = 'Общий список'
+        verbose_name = _('Общий список')
+        verbose_name_plural = _('Общий список')
 
+
+# class ProfileInRegistration(Profile):
+#     objects = ProfileInRegistrationManager()
+
+#     class Meta:
+#         proxy = True
+#         verbose_name = 'На регистрации'
+#         verbose_name_plural = 'На регистрации'
 
 
 class ProfileInEssentialInfo(Profile):
@@ -1123,17 +1071,17 @@ class ProfileInEssentialInfo(Profile):
 
     class Meta:
         proxy = True
-        verbose_name = 'Справочная информация'
-        verbose_name_plural = 'Справочная информация'
+        verbose_name = _('Справочная информация')
+        verbose_name_plural = _('Справочная информация')
 
 
-class ProfileInTermin(Profile):
-    objects = ProfileInTerminManager()
+# class ProfileInTermin(Profile):
+#     objects = ProfileInTerminManager()
 
-    class Meta:
-        proxy = True
-        verbose_name = 'Термин'
-        verbose_name_plural = 'Термины'
+#     class Meta:
+#         proxy = True
+#         verbose_name = 'Термин'
+#         verbose_name_plural = 'Термины'
 
 
 class ProfileInInterview(Profile):
@@ -1141,17 +1089,17 @@ class ProfileInInterview(Profile):
 
     class Meta:
         proxy = True
-        verbose_name = 'Собеседование'
-        verbose_name_plural = 'Собеседование'
+        verbose_name = _('Собеседование')
+        verbose_name_plural = _('Собеседование')
 
 
-class ProfileInRefused(Profile):
-    objects = ProfileRefusedManager()
+# class ProfileInRefused(Profile):
+#     objects = ProfileRefusedManager()
 
-    class Meta:
-        proxy = True
-        verbose_name = 'Отказавшиеся'
-        verbose_name_plural = 'Отказавшиеся'
+#     class Meta:
+#         proxy = True
+#         verbose_name = 'Отказавшиеся'
+#         verbose_name_plural = 'Отказавшиеся'
 
 
 class ProfileInVacancy(Profile):
@@ -1159,8 +1107,8 @@ class ProfileInVacancy(Profile):
 
     class Meta:
         proxy = True
-        verbose_name = 'Вакансия'
-        verbose_name_plural = 'Вакансия'
+        verbose_name = _('Вакансия')
+        verbose_name_plural = _('Вакансия')
         ordering = ['termin', 'last_name', 'first_name', ]
 
 
@@ -1169,17 +1117,17 @@ class ProfileInEmbassy(Profile):
 
     class Meta:
         proxy = True
-        verbose_name = 'Посольство'
-        verbose_name_plural = 'Посольство'
+        verbose_name = _('Посольство')
+        verbose_name_plural = _('Посольство')
 
 
-class ProfileInSending(Profile):
-    objects = ProfileInSendingManager()
+# class ProfileInSending(Profile):
+#     objects = ProfileInSendingManager()
 
-    class Meta:
-        proxy = True
-        verbose_name = 'Отправка'
-        verbose_name_plural = 'Отправка'
+#     class Meta:
+#         proxy = True
+#         verbose_name = 'Отправка'
+#         verbose_name_plural = 'Отправка'
 
 
 class ProfileInContactDetails(Profile):
@@ -1187,29 +1135,29 @@ class ProfileInContactDetails(Profile):
 
     class Meta:
         proxy = True
-        verbose_name = 'Контактные данные'
-        verbose_name_plural = 'Контактные данные'
+        verbose_name = _('Контактные данные')
+        verbose_name_plural = _('Контактные данные')
 
 
-class ProfileInArchive(Profile):
-    objects = ProfileInArchiveManager()
+# class ProfileInArchive(Profile):
+#     objects = ProfileInArchiveManager()
 
-    class Meta:
-        proxy = True
-        verbose_name = 'Архив'
-        verbose_name_plural = 'Архив'
+#     class Meta:
+#         proxy = True
+#         verbose_name = 'Архив'
+#         verbose_name_plural = 'Архив'
 
 
 class Bill(models.Model):
-    profile = models.ForeignKey(Profile, verbose_name='Оплатил', related_name='bills', on_delete=models.PROTECT)
-    who_created = models.ForeignKey(User, verbose_name='Оплату принял', related_name='bills', on_delete=models.PROTECT)
-    pay_sum = models.IntegerField('Сумма оплаты')
-    created_at = models.DateTimeField('Время создания счета', auto_now_add=True)
-    updated_at = models.DateTimeField('Время изменения счета', auto_now=True)
+    profile = models.ForeignKey(Profile, verbose_name=_('Оплатил'), related_name='bills', on_delete=models.PROTECT)
+    who_created = models.ForeignKey(User, verbose_name=_('Оплату принял'), related_name='bills', on_delete=models.PROTECT)
+    pay_sum = models.IntegerField(_('Сумма оплаты'))
+    created_at = models.DateTimeField(_('Время создания счета'), auto_now_add=True)
+    updated_at = models.DateTimeField(_('Время изменения счета'), auto_now=True)
 
     class Meta:
-        verbose_name = 'Счет'
-        verbose_name_plural = 'Счета'
+        verbose_name = _('Счет')
+        verbose_name_plural = _('Счета')
 
     def __str__(self):
         return f'{self.id}'
@@ -1217,71 +1165,129 @@ class Bill(models.Model):
 
 class ProfileHistory(models.Model):
 
-    username = models.CharField(verbose_name='Автор изменений', max_length=128)
-    date = models.DateTimeField(verbose_name='Дата изменений', blank=True, null=True)
-    changes = models.TextField(verbose_name='Текст изменения')
+    username = models.CharField(verbose_name=_('Автор изменений'), max_length=128)
+    date = models.DateTimeField(verbose_name=_('Дата изменений'), blank=True, null=True)
+    changes = models.TextField(verbose_name=_('Текст изменения'))
 
     def __str__(self):
         return self.username + "' changes"
 
     class Meta:
-        verbose_name = 'История изменений Характеристики'
-        verbose_name_plural = 'Истории изменений Характеристики'
+        verbose_name = _('История изменений Характеристики')
+        verbose_name_plural = _('Истории изменений Характеристики')
 
 
-@receiver(post_save, sender=LogEntry)
-def create_characteristics_history(sender, instance, created, **kwargs):
+
+@receiver(post_save, sender=Profile)
+def count_amount_of_profiles(sender, instance, created, **kwargs):
 
     if created:
-        if instance.action_flag == 2 and instance.object_repr in ['Вакансия', 'Отказавшиеся', 'Собеседование',
-                                                                  'Термин', 'Справочная информация', 'На регистрации',
-                                                                  'Общий список', 'profile', ]:
-            msg = json.loads(instance.change_message)
-            profile = Profile.objects.get(id=instance.object_id)
+        history, created = ProfileCounter.objects.get_or_create(creation_date=datetime.date.today())
+        
+        names = history.list_of_names
 
-            if msg:
-                change_msg = msg[0].get('changed')
-                if change_msg:
-                    fields = change_msg.get('fields')
+        if names is not None:
 
-                    if 'characteristics' in fields:
-                        ProfileHistory.objects.create(
-                            username=instance.user.email,
-                            date=instance.action_time,
-                            changes=profile.characteristics
-                            )
-        elif instance.action_flag == 1 and instance.object_repr=='На регистрации':
-            profile = Profile.objects.get(id=instance.object_id)
+            if hasattr(instance, 'full_name'):
+                history.list_of_names.append(instance.full_name)
+                
+            else:
+                history.list_of_names.append(instance.user.email)
+        else:
+            names = []
+            if hasattr(instance, 'full_name'):
+                names.append(instance.full_name)
 
-            if profile.characteristics != '':
-                ProfileHistory.objects.create(
-                    username=instance.user.email,
-                    date=instance.action_time,
-                    changes=profile.characteristics
-                )
+            else:
+                names.append(instance.user.email)
+            history.list_of_names = names
 
-from django.utils import timezone
+        history.amount_of_profiles += 1
+        history.save(update_fields=['list_of_names', 'amount_of_profiles'])
 
 
+class SupportRequest(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name=_('Пользователь'))
+    message = models.TextField(_('Сообщение'))
+    created_at = models.DateTimeField(_('Дата создания'), auto_now_add=True)
+   
+
+    
+
+    def str(self):
+        return f"Запрос от {self.user.email}: {self.created_at}"
+    
+    class Meta:
+        verbose_name = _('Тех поддержка')
+        verbose_name_plural = _('Тех поддержка')
+    
+
+class SupportResponse(models.Model):
+    support_request = models.ForeignKey(SupportRequest, on_delete=models.CASCADE, related_name='response')
+    message = models.TextField(_('Ответ'))
+    created_at = models.DateTimeField(_('Дата создания'), auto_now_add=True)
+    sent = models.BooleanField(_('Отправлено'), default=False)
+    
+    def save(self, *args, **kwargs):
+        self.sent = True
+        super(SupportResponse, self).save(*args, **kwargs)
+    
+
+    def str(self):
+        return f"Ответ к запросу {self.support_request.id}"
+
+
+class Announcement(models.Model):
+    title = models.CharField(max_length=100)
+    content = models.TextField(blank=True, null=True)
+    photo = models.ImageField(upload_to="announcements/", blank=True, null=True)
+    video = models.FileField(upload_to="announcement_videos/", blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    specific_student = models.ForeignKey(
+        User,
+        related_name="student_announcements",
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
+    )
+    specific_employer = models.ForeignKey(
+        User,
+        related_name="employer_announcements",
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
+    )
+    send_to_students = models.BooleanField(
+        default=False, verbose_name=_("Отправить студентам")
+    )
+    send_to_employers = models.BooleanField(
+        default=False, verbose_name=_("Отправить работодателям")
+    )
+
+    class Meta:
+        verbose_name = _("Объявление")
+        verbose_name_plural = _("Объявления")
+
+    def str(self):
+        return self.title
+    
 class ConnectionRequest(models.Model):
-    full_name = models.CharField("ФИО", max_length=255, blank=True, null=True)
-    email = models.EmailField("Емайл", unique=True)
-    phone = models.CharField("Номер телефона", max_length=50)
-    request_date = models.DateTimeField("Дата заявки", default=timezone.now)
-    manager_notes = models.TextField("Примечание менеджера", blank=True, null=True)
-    call_date = models.DateField("Дата звонка менеджера", blank=True, null=True)
-    text = models.TextField("Комментарий", blank=True, null=True)
-    called = models.BooleanField("Позвонил", default=False)
-    consulted = models.BooleanField("Проконсультирован", default=False)
-    call_later = models.BooleanField("Набрать позже", default=False)
-    processed = models.BooleanField("Обработан", default=False)
-    paid = models.BooleanField("Оплачен", default=False)
+    full_name = models.CharField(_("ФИО"), max_length=255, blank=True, null=True)
+    email = models.EmailField(_("Емайл"), unique=True)
+    phone = models.CharField(_("Номер телефона"), max_length=50)
+    request_date = models.DateTimeField(_("Дата заявки"), default=timezone.now)
+    manager_notes = models.TextField(_("Примечание менеджера"), blank=True, null=True)
+    call_date = models.DateField(_("Дата звонка менеджера"), blank=True, null=True)
+    text = models.TextField(_("Комментарий"), blank=True, null=True)
+    called = models.BooleanField(_("Позвонил"), default=False)
+    consulted = models.BooleanField(_("Проконсультирован"), default=False)
+    call_later = models.BooleanField(_("Набрать позже"), default=False)
+    paid = models.BooleanField(_("Оплачен"), default=False)
+    
 
-    def __str__(self):
+    def str(self):
         return self.email
 
     class Meta:
-        verbose_name = 'Заявка на подключение'
-        verbose_name_plural = 'Заявки на подключение'
-
-
+        verbose_name = _("Заявка на подключение")
+        verbose_name_plural = _("Заявки на подключение")
