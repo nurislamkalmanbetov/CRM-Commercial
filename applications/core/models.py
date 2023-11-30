@@ -15,6 +15,10 @@ from datetime import timedelta
 
 from django.utils.translation import gettext, gettext_lazy as _
 
+from ckeditor.fields import RichTextField
+
+
+
 
 
 # from django.contrib.auth import get_user_model
@@ -106,7 +110,7 @@ class EmployerCompany(models.Model):
     user = models.ForeignKey('accounts.User', on_delete=models.CASCADE, blank=True, verbose_name=_('Работодатель'))
     name = models.CharField(verbose_name=_('Название'), blank=True, max_length=255)
     country = models.CharField(_('страна'), max_length=128, blank=True, default='')
-    description = models.TextField(_('Описание'), blank=True, default='')
+    description = RichTextField(_('Описание'), blank=True, default='')
 
     def __str__(self):
         return self.name
@@ -182,7 +186,7 @@ class Vacancy(models.Model):
     exchange = models.CharField(max_length=10, choices=EXCHANGE, default='', blank=True)
     name = models.CharField(_('Название вакансии'), max_length=255)
     salary = models.IntegerField(_('Зарплата'))
-    duty = models.TextField(_('Обязанности работника'), blank=True, default='')
+    duty = RichTextField(_('Обязанности работника'), blank=True, default='')
     city = models.CharField(_('Город'), max_length=128, blank=True, default='')
     accomodation_type = models.CharField(_('Жилье'), choices=ACCOMODATION_TYPE_CHOICES, max_length=50,
                                          default='', blank=True)
@@ -190,10 +194,10 @@ class Vacancy(models.Model):
     is_vacancy_confirmed = models.BooleanField(_('Прошел на вакансию'), default=False)
     insurance = models.BooleanField(_('Страховка'), default=False)
     transport = models.CharField(_('Транспорт'), max_length=128, blank=True, default='')
-    contact_info = models.TextField(_('Контактные данные'), blank=True, default='')
-    destination_point = models.TextField(_('Пункт назначения'), blank=True, default='')
+    contact_info = RichTextField(_('Контактные данные'), blank=True, default='')
+    destination_point = RichTextField(_('Пункт назначения'), blank=True, default='')
     employer_dementions = models.CharField(_('Требования работодателя'), max_length=128, blank=True, default='')
-    extra_info = models.CharField(_('Доп. информация'), max_length=255, blank=True, default='')
+    extra_info = RichTextField(_('Доп. информация'), max_length=255, blank=True, default='')
     created_date = models.DateTimeField(default=timezone.now, verbose_name=_('Дата публикации'))
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True, verbose_name=_('Категория'), db_index=True)
     subcategory = models.ForeignKey(Subcategory, on_delete=models.SET_NULL, null=True, blank=True, verbose_name=_('Подкатегория'), db_index=True)
