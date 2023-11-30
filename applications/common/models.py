@@ -1,5 +1,6 @@
 from django.db import models
-
+from django.utils import timezone
+from ckeditor.fields import RichTextField
 
 class SingletonModel(models.Model):
 
@@ -35,3 +36,44 @@ class SiteSettings(SingletonModel):
     class Meta:
         verbose_name = 'Настройки CRM'
         verbose_name_plural = 'Настройки CRM'
+
+
+class FooterLink(models.Model):
+    instagram_link = models.CharField(max_length=100, blank=True, null=True, verbose_name="Ссылка на Instagram")
+    facebook_link = models.CharField(max_length=100, blank=True, null=True, verbose_name="Ссылка на Facebook")
+    whatsapp_link = models.CharField(max_length=100, blank=True, null=True, verbose_name="Ссылка на WhatsApp")
+    phone_number = models.CharField(max_length=20, blank=True, null=True, verbose_name="Номер телефона")
+    address = models.CharField(max_length=200, blank=True, null=True, verbose_name="Адрес")
+    email = models.EmailField(blank=True, null=True, verbose_name="Email")
+    created_at = models.DateTimeField(default=timezone.now, verbose_name="Дата создания")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Дата обновления")
+    created_by = models.ForeignKey('accounts.User', on_delete=models.SET_NULL, null=True, blank=True, related_name='created_footer_links', verbose_name="Создано пользователем")
+    text = RichTextField(verbose_name="Текст для футера")
+
+    def str(self):
+        return f"Контактная информация для {self.email if self.email else 'Пользователя'}"
+
+    def save(self, *args, **kwargs):
+        if self.whatsapp_link and not self.whatsapp_link.startswith('wa.me/') and not self.whatsapp_link.startswith('+'):
+            self.whatsapp_link = f'wa.me/{self.whatsapp_link}'
+        super().save(*args, **kwargs)
+
+    class Meta:
+        verbose_name = 'Информация внизу сайта'
+        verbose_name_plural = 'Информации внизу сайта'
+
+
+class Logo(models.Model):
+    image = models.ImageField(upload_to='logos/', verbose_name='Изображение логотипа')
+    description = models.TextField(blank=True, verbose_name='Описание логотипа')
+    created_by = models.ForeignKey('accounts.User', on_delete=models.CASCADE, verbose_name='Создано пользователем')
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания')
+    updated_at = models.DateTimeField(auto_now=True, verbose_name='Дата последнего обновления')
+    external_url = models.URLField(blank=True, verbose_name='Внешний URL логотипа')
+
+    def __str__(self):
+        return f"Логотип {self.id}"
+    
+    class Meta:
+        verbose_name = 'Лого сайта'
+        verbose_name_plural = 'Лого сайтов'

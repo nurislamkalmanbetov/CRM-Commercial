@@ -31,6 +31,7 @@ from django.utils.translation import gettext_lazy as _
 from smart_selects.db_fields import ChainedForeignKey
 
 
+
 class User(AbstractBaseUser, PermissionsMixin):
     avatar = models.ImageField(upload_to='user_avatar/', null=True, blank=True)
     email = models.EmailField(_('Email адрес'), unique=True, db_index=True)

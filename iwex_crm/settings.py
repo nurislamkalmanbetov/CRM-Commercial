@@ -53,8 +53,6 @@ ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 INSTALLED_APPS = [
     'smart_selects',
     'rangefilter',
-    # 'applications.apps.SuitConfig',
-    # 'applications.apps.JazzminConfig',
 
     #notifications
     'channels',
@@ -95,9 +93,16 @@ INSTALLED_APPS = [
     'oauth2_provider',
     'social_django',
     'drf_social_oauth2',
+
+    #3rd Party App
+    'ckeditor',
+    'user_visit',
 ]
 
+SITE_ID = 1
+
 AUTH_USER_MODEL = 'accounts.User'
+
 
 # new
 AUTHENTICATION_BACKENDS = [
@@ -172,7 +177,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'querycount.middleware.QueryCountMiddleware',
-
+    'user_visit.middleware.UserVisitMiddleware',   
     'allauth.account.middleware.AccountMiddleware',
 ]
 
@@ -210,26 +215,27 @@ WSGI_APPLICATION = 'iwex_crm.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': env('POSTGRES_DB'),
-        'USER': env('POSTGRES_USER'),
-        'PASSWORD': env('POSTGRES_PASSWORD'),
-        'HOST': env('POSTGRES_HOST'),
-        'PORT': env('POSTGRES_PORT'),
-    }
-}
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-#         'NAME': 'iwex-crm-master6',
-#         'USER': 'postgres',
-#         'PASSWORD': 'qwerty123',
-#         'HOST': 'localhost',
-#         'PORT': '5432',
+#         'NAME': env('POSTGRES_DB'),
+#         'USER': env('POSTGRES_USER'),
+#         'PASSWORD': env('POSTGRES_PASSWORD'),
+#         'HOST': env('POSTGRES_HOST'),
+#         'PORT': env('POSTGRES_PORT'),
 #     }
 # }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'iwex-crm-master6',
+        'USER': 'postgres',
+        'PASSWORD': 'qwerty123',
+        'HOST': 'localhost',
+        'PORT': '5432',
+        'OPTIONS': {},
+    }
+}
 
 
 

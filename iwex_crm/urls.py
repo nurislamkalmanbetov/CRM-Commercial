@@ -67,11 +67,14 @@ urlpatterns = [
     path('chaining/', include('smart_selects.urls')),
     path('accounts/', include('applications.accounts.urls')),
     path('core/', include('applications.core.urls')),
+    path('common/', include('applications.common.urls')),
+
     # new
     path('auth/', include('drf_social_oauth2.urls', namespace='drf_auth')),
-
+    
     path('social_auth/', include(('applications.social_auth.urls', 'social_auth_app'), namespace="social_auth")),
     path('', main_page, name='main-page'),
+    
     path('reset/', auth_views.PasswordResetView.as_view(), name='reset-password-page'),
     path('reset/done/', auth_views.PasswordResetDoneView.as_view(), name='password_reset_done'),
     path('reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
