@@ -33,4 +33,4 @@ For downloading, write this:
    ```bash
    pip install django-jazzmin
 
-![Admin Panel Django](media/adminpanel.pdf)
+![Admin Panel Django](media/adminpanel.jpg)
