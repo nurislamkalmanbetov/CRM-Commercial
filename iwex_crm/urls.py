@@ -39,6 +39,7 @@ urlpatterns = [
     path('chaining/', include('smart_selects.urls')),
     path('accounts/', include('applications.accounts.urls')),
     path('core/', include('applications.core.urls')),
+    path('common/', include('applications.common.urls')),
     path('bot/', include('applications.bot.urls')),
     path('', main_page, name='main-page'),
     path('reset/', auth_views.PasswordResetView.as_view(), name='reset-password-page'),

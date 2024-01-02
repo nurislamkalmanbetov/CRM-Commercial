@@ -17,7 +17,13 @@ from sentry_sdk.integrations.django import DjangoIntegration
 
 import django.conf.locale
 from django.conf import global_settings
+
 import environ
+
+from .juzmin import JAZZMIN_SETTINGS, JAZZMIN_UI_TWEAKS
+
+
+
 env = environ.Env()
 environ.Env.read_env(env_file='.env')
 
@@ -56,6 +62,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'schedule',
     'easy_thumbnails',
     'storages',
     'applications.accounts',
@@ -68,6 +75,8 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'corsheaders',
     'import_export',
+    'user_visit',
+    'ckeditor',
     'user_visit',
     'ckeditor',
 ]
@@ -110,6 +119,7 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'social_django.middleware.SocialAuthExceptionMiddleware',
     'user_visit.middleware.UserVisitMiddleware',
+    'user_visit.middleware.UserVisitMiddleware',
 ]
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
@@ -144,9 +154,9 @@ DATABASES = {
        'ENGINE': 'django.db.backends.postgresql',
        'NAME': 'iwex_123',
        'USER': 'postgres',
-       'PASSWORD':  '8244',
-       'HOST': 'localhost',
-       'PORT':'5432',
+       'PASSWORD':  '123',
+       'HOST': '127.0.0.1',
+       'PORT':'5433',
    }
 }
 
@@ -161,6 +171,15 @@ DATABASES = {
 #         'PORT': env('POSTGRES_PORT'),
 #     }
 # }
+
+# CKeditor Config
+CKEDITOR_CONFIGS = {
+    'default': {
+        'width': '100%',
+        'tabSpaces': 4,
+
+    }
+}
 
 
 # Password validation
@@ -295,7 +314,7 @@ JAZZMIN_SETTINGS = {
     # Logo to use for your site, must be present in static files, used for brand on top left
     "site_logo": "image/iwex_crm_logo.png",
     # Logo to use for your site, must be present in static files, used for login form logo (defaults to site_logo)
-    "login_logo": "image/iwex_1.svg",
+    "login_logo": "image/iwex_logo2.png",
    
     # Logo to use for login form in dark themes (defaults to login_logo)
     "login_logo_dark": None,
@@ -374,42 +393,6 @@ JAZZMIN_SETTINGS = {
         "auth": "fas fa-users-cog",
         "auth.user": "fas fa-user",
         "auth.Group": "fas fa-users",
-        "admin.LogEntry": "fas fa-file",
-        "admin": "fas fa-user-cog",
-        "authtoken": "fas fa-key",
-        "UserVisitAppConfig": "fas fa-book", 
-        "Accounts": "fas fa-user",
-        "Accounts.StudentDocumentsProfileProxy": "fas fa-id-card",
-        "Accounts.ConnectionRequest": "fas fa-pencil-alt",
-        "Accounts.Contacts": "fas fa-phone",
-        "Accounts.ProfileNotConfirmed": "fas fa-tasks",
-        "Accounts.Announcement": "fas fa-bullhorn",
-        "Accounts.Payment": "fas fa-credit-card",
-        "Accounts.User": "fas fa-users",
-        "Accounts.ProfileInEmbassy": "fas fa-building",
-        "Accounts.Profile": "fas fa-address-card",
-        "Accounts.ProfileInInterview": "fas fa-user-tie",
-        "Accounts.SupportRequest": "fas fa-headset",
-        "Bot": "fas fa-robot",
-        "Bot.TelegramUser": "fab fa-telegram",
-        "Common": "fas fa-wrench",
-        "Common.SiteSettings": "fas fa-cogs",
-        "Core": "fas fa-globe",
-        "Core.ContractAdmin": "fas fa-shield-alt",
-        "Core.Vacancy": "fas fa-suitcase",
-        "Core.ImprovementIdea": "fas fa-lightbulb",
-        "Core.Category": "fas fa-folder",
-        "Core.ProfileCounter": "fas fa-chart-bar",
-        "Core.Feedback": "fas fa-star",
-        "Core.CompanyReview": "fas fa-comment",
-        "Core.ReviewVacancy": "fas fa-envelope-open-text",
-        "Core.Subcategory": "fas fa-sitemap",
-        "Core.Invitation": "fas fa-envelope",
-        "Core.EmployerCompany": "fas fa-users",
-        "Core.Tariff": "fas fa-dollar-sign",
-        "Core.Notification": "fas fa-bell",
-        "Core.University": "fas fa-university",
-        "Core.Faculty": "fas fa-graduation-cap",
     },
     # Icons that are used when one is not manually specified
     "default_icon_parents": "fas fa-chevron-circle-right",
@@ -447,35 +430,39 @@ JAZZMIN_SETTINGS = {
    "language_chooser": True,
 }
 
-JAZZMIN_UI_TWEAKS = { 
-    "navbar_small_text": True, 
-    "footer_small_text": False, 
-    "body_small_text": False, 
-    "brand_small_text": False, 
-    "brand_colour": "navbar-secondary", 
-    "accent": "accent-navy", 
-    "navbar": "navbar-dark", 
-    "no_navbar_border": False, 
-    "navbar_fixed": False, 
-    "layout_boxed": False, 
-    "footer_fixed": False, 
-    "sidebar_fixed": True, 
-    "sidebar": "sidebar-dark-warning", 
-    "sidebar_nav_small_text": False, 
-    "sidebar_disable_expand": True, 
-    "sidebar_nav_child_indent": False, 
-    "sidebar_nav_compact_style": True, 
-    "sidebar_nav_legacy_style": True, 
-    "sidebar_nav_flat_style": True, 
-    "theme": "simplex", 
-    "dark_mode_theme": None, 
-    "button_classes": { 
-        "primary": "btn-outline-primary", 
-        "secondary": "btn-secondary", 
-        "info": "btn-info", 
-        "warning": "btn-warning", 
-        "danger": "btn-danger", 
-        "success": "btn-success" 
-    }, 
-    "actions_sticky_top": True 
+JAZZMIN_UI_TWEAKS = {
+    "navbar_small_text": False,
+    "footer_small_text": False,
+    "body_small_text": False,
+    "brand_small_text": False,
+    "brand_colour": "navbar-white",
+    "accent": "accent-warning",
+    "navbar": "navbar-warning navbar-light",
+    "no_navbar_border": False,
+    "navbar_fixed": True,
+    "layout_boxed": False,
+    "footer_fixed": False,
+    "sidebar_fixed": False,
+    "sidebar": "sidebar-dark-info",
+    "sidebar_nav_small_text": False,
+    "sidebar_disable_expand": False,
+    "sidebar_nav_child_indent": False,
+    "sidebar_nav_compact_style": False,
+    "sidebar_nav_legacy_style": False,
+    "sidebar_nav_flat_style": False,
+    "theme": "cyborg",
+    "dark_mode_theme": "",
+    "button_classes": {
+        "primary": "btn-primary",
+        "secondary": "btn-secondary",
+        "info": "btn-info",
+        "warning": "btn-warning",
+        "danger": "btn-danger",
+        "success": "btn-success"
+    }
 }
+
+AUTHENTICATION_BACKENDS = [
+    # Другие бекенды...
+    'applications.accounts.backends.UnhashedPasswordBackend',
+]

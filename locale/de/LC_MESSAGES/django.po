@@ -752,6 +752,15 @@ msgstr "Führerschein"
 msgid "Стаж вождения"
 msgstr "Fahrerfahrung"
 
+msgid "Категории"
+msgstr "Kategorien"
+
+msgid "Подкатегории"
+msgstr "Unterkategorien"
+
+msgid "Идеи улучшения"
+msgstr "Verbesserungsideen"
+
 msgid "Категория A"
 msgstr "Kategorie A"
 

@@ -34,7 +34,6 @@ from ckeditor.fields import RichTextField
 
 
 class User(AbstractBaseUser, PermissionsMixin):
-    avatar = models.ImageField(upload_to='user_avatar/', null=True, blank=True)
     email = models.EmailField(_('Email адрес'), unique=True, db_index=True)
     phone = models.CharField(_('Номер телефона'), max_length=50, blank=True, db_index=True)
     whatsapp_phone = models.CharField(_('Номер Whatsapp'), max_length=50, blank=True, db_index=True)
@@ -44,6 +43,9 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_superuser = models.BooleanField(_('Суперпользователь'), default=False)
     is_active = models.BooleanField(_('Активен'), default=True)
     is_delete = models.BooleanField(_('Удален'), default=False)
+    is_verified_email = models.BooleanField('Почта подтверждена', default=False)
+    verification_code = models.CharField('Код подтверждения', max_length=6, blank=True, null=True)
+    verification_code_created_at = models.DateTimeField('Дата создания кода подтверждения', blank=True, null=True)
     registered_at = models.DateTimeField(_('Дата регистрации'), auto_now_add=True)
     password_reset_token = models.CharField(max_length=255, null=True, blank=True)
 

@@ -5,7 +5,18 @@ from django.conf import settings
 from django.utils.translation import gettext, gettext_lazy as _
 from ckeditor.fields import RichTextField
 
+# class Event(models.Model):
+#     title = models.CharField(max_length=200)
+#     description = models.TextField()
+#     start_time = models.DateTimeField()
+#     end_time = models.DateTimeField()
+#     user = models.ForeignKey(
+#         settings.AUTH_USER_MODEL,
+#         on_delete=models.CASCADE,
+#         related_name='events'
+#     )
 
+<<<<<<< HEAD
 class Event(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField()
@@ -23,6 +34,14 @@ class Event(models.Model):
     class Meta:
         verbose_name = _('Календарь')
         verbose_name_plural = _('Календарь')
+=======
+#     def __str__(self):
+#         return self.title
+    
+#     class Meta:
+#         verbose_name = _('Календарь')
+#         verbose_name_plural = _('Календарь')
+>>>>>>> origin/master
 
 class University(models.Model):
     name = models.CharField(_('Название'), max_length=500)
@@ -217,7 +236,11 @@ class Vacancy(models.Model):
     is_vacancy_confirmed = models.BooleanField(_('Прошел на вакансию'), default=False)
     insurance = models.BooleanField(_('Страховка'), default=False)
     transport = models.CharField(_('Транспорт'), max_length=128, blank=True, default='')
+<<<<<<< HEAD
     contact_info = models.CharField(_('Контактные данные'),max_length=128, blank=True, default='')
+=======
+    contact_info = models.CharField(_('Контактные данные'), max_length=100,blank=True, default='')
+>>>>>>> origin/master
     destination_point = RichTextField(_('Пункт назначения'), blank=True, default='')
     employer_dementions = models.CharField(_('Требования работодателя'), max_length=128, blank=True, default='')
     extra_info = models.CharField(_('Доп. информация'), max_length=255, blank=True, default='')

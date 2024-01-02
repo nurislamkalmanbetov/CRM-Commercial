@@ -17,11 +17,78 @@ from django.core.mail import send_mail
 from .models import Profile, SupportRequest, SupportResponse
 from .serializers import *
 from django.template.loader import render_to_string
+from random import randint
 
 
 User = get_user_model()
 
+class RegistrationAPIView(generics.CreateAPIView):
+    serializer_class = RegistrationSerializer
+    queryset = User.objects.all()  
 
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            user = User.objects.filter(email=serializer.data['email']).first()
+            if user is not None:
+                return Response({"error": "Пользователь уже существует"}, status=status.HTTP_400_BAD_REQUEST)
+            user = User.objects.create_user(
+                email=serializer.data['email'],
+                password=serializer.data['password']
+            )
+            
+            verification_code = randint(1000, 9999)
+            user.verification_code = verification_code
+            user.save()
+            context = {
+                'verification_code': verification_code,
+                
+            }
+          
+            html_message = render_to_string('email_template.html', context)
+            
+          
+            subject = 'Подтверждение регистрации'
+            recipient_list = [user.email]  
+            send_mail(subject, None, 'kalmanbetovnurislam19@gmail.com', recipient_list, html_message=html_message, fail_silently=False)
+            print("ok")
+
+            return Response({
+                "messsage": "Успешная регистрация",
+                "user": user.email,
+            })
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+class VerifyEmailAPIView(APIView):
+    serializer_class = VerifyEmailSerializer
+    queryset = User.objects.all()  
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            email = serializer.data['email']
+            verification_code = serializer.data['verification_code']
+            user = User.objects.filter(email=email).first()
+            if user is None:
+                return Response({"error": "Пользователь не найден"}, status=status.HTTP_404_NOT_FOUND)
+            if user.verification_code != verification_code:
+                return Response({"error": "Неверный код"}, status=status.HTTP_400_BAD_REQUEST)
+            user.is_active = True
+            user.is_verified_email = True
+            user.verification_code = None
+            user.save()
+            refresh = RefreshToken.for_user(user)
+            return Response({
+                "messsage": "Почта подтверждена",
+                "user": user.email,
+                "refresh": str(refresh),
+                "access": str(refresh.access_token),
+            })
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        
 
 class UserLoginView(generics.CreateAPIView):
     serializer_class = UserLoginSerializer
@@ -39,16 +106,22 @@ class UserLoginView(generics.CreateAPIView):
             return Response({
                 'message': 'Вход успешно выполнен',
                 'email': user.email,
+                'is_employer': user.is_employer,
+                'is_student': user.is_student,
 
                 'refresh_token': str(refresh),
                 'access_token': str(refresh.access_token)
+                
             })
         else:
             return Response({'message': 'Неверный логин или пароль'}, status=status.HTTP_401_UNAUTHORIZED)
+        
+
+
 
 
 class AdminCreateUserView(generics.CreateAPIView):
-    serializer_class = UserSerializer  # Замените на свой сериализатор пользователя
+    serializer_class = UserSerializer  
 
     def create(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
@@ -74,11 +147,12 @@ class AdminCreateUserView(generics.CreateAPIView):
 
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
+    
 
 
 class ProfileView(generics.CreateAPIView):
     serializer_class = ProfileSerializer
-    queryset = Profile.objects.all()  # предположим, что модель называется Profile
+    queryset = Profile.objects.all()  
     parser_classes = (MultiPartParser, FormParser)
 
     def perform_create(self, serializer):
@@ -136,11 +210,6 @@ class UserView(ListAPIView):
     filterset_fields = ['email']
 
     
-class UserListView(viewsets.ModelViewSet):
-    queryset = User.objects.all()
-    serializer_class = UserListPutchSerializer
-    parser_classes = (MultiPartParser, FormParser)
-
 
 class SupportRequestListCreateView(generics.ListCreateAPIView):
     queryset = SupportRequest.objects.select_related('user').all()
@@ -221,3 +290,4 @@ class ConnectionRequestListCreateView(generics.ListCreateAPIView):
     def post(self, request, *args, **kwargs):
         """Создание новой заявки на подключение"""
         return self.create(request, *args, **kwargs)
+

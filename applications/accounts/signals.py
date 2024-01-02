@@ -12,29 +12,29 @@ from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 # from applications.bot.models import TelegramUser
 
-@receiver(post_save, sender=User)
-def send_password_email(sender, instance, created, **kwargs):
-    if created:
-        subject = 'Данные для входа в систему'
-        message = f'Добро пожаловать!\n\n'
-        message += f'Логин (Gmail): {instance.email}\n'
-        message += f'Пароль: {instance.password}\n'
-        message += f'можете перейти на наш сайт https://www.iwex.kg/ \n'
+# @receiver(post_save, sender=User)
+# def send_password_email(sender, instance, created, **kwargs):
+#     if created:
+#         subject = 'Данные для входа в систему'
+#         message = f'Добро пожаловать!\n\n'
+#         message += f'Логин (Gmail): {instance.email}\n'
+#         message += f'Пароль: {instance.password}\n'
+#         message += f'можете перейти на наш сайт https://www.iwex.kg/ \n'
         
-        if instance.phone:
-            message += f'Номер телефона: {instance.phone}\n'
+#         if instance.phone:
+#             message += f'Номер телефона: {instance.phone}\n'
         
-        if instance.whatsapp_phone:
-            message += f'Номер Whatsapp: {instance.whatsapp_phone}\n'
+#         if instance.whatsapp_phone:
+#             message += f'Номер Whatsapp: {instance.whatsapp_phone}\n'
         
-        from_email = 'kalmanbetovnurislam19@gmail.com'  
+#         from_email = 'kalmanbetovnurislam19@gmail.com'  
 
-        recipient_list = [instance.email]
+#         recipient_list = [instance.email]
 
-        try:
-            send_mail(subject, message, from_email, recipient_list, fail_silently=False)
-        except Exception as e:
-            pass
+#         try:
+#             send_mail(subject, message, from_email, recipient_list, fail_silently=False)
+#         except Exception as e:
+#             pass
 
 
 @receiver(post_save, sender=ConnectionRequest)

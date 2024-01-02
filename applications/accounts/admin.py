@@ -20,6 +20,8 @@ from django.db.models import ManyToManyField, Q
 from django.utils.html import format_html
 from django.contrib import messages
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from django.utils.translation import gettext_lazy as _
+
 
 
 
@@ -29,7 +31,9 @@ User = get_user_model()
 class UserAdmin(ImportExportModelAdmin, admin.ModelAdmin):
     # fields = ['email', 'phone', 'whatsapp_phone', 'password','is_staff','is_employer', 'is_student', 'is_delete', 'is_active', 'is_superuser', ]
     fieldsets = (
-        (None, {'fields': ('email', 'phone', 'whatsapp_phone', 'password','is_staff','is_employer', 'is_student', 'is_delete', 'is_active', 'is_superuser',)}),
+        (None, {'fields': ('email', 'phone', 'whatsapp_phone','verification_code', 'password','is_employer', 'is_student', 'is_delete',)}),
+        (_('Permissions'), {'fields': ('is_staff', 'is_active', 'is_superuser','user_permissions')}),
+        (_('Important dates'), {'fields': ('last_login',)}),
             )
     add_fieldsets = (
         (None, {
@@ -37,10 +41,12 @@ class UserAdmin(ImportExportModelAdmin, admin.ModelAdmin):
             'fields': ('email', 'phone','whatsapp_phone', 'password1','password2','is_staff','is_employer', 'is_student', 'is_delete', 'is_active', 'is_superuser', ),
         }),
     )
-    list_display = ['id','email', 'phone', 'whatsapp_phone', 'is_staff', 'is_delete', 'is_active','is_employer', 'is_student', 'is_superuser', ]
+    list_display = ['id','email','verification_code', 'phone', 'whatsapp_phone', 'is_staff', 'is_delete', 'is_active','is_employer', 'is_student', 'is_superuser', ]
     search_fields = ['email', 'phone', 'whatsapp_phone', ]
     list_editable = ['is_staff', 'is_delete', 'is_active','is_employer', 'is_student', 'is_superuser',]
     ordering = ('id',)
+    filter_horizontal = ('groups', 'user_permissions')
+
 
     class Meta:
         model = User

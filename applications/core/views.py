@@ -11,10 +11,30 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
+<<<<<<< HEAD
 from rest_framework import viewsets
 from .models import Vacancy, Event
+=======
+from rest_framework.permissions import IsAuthenticated
+
+from rest_framework import viewsets
+# from schedule.models import Event
+from .models import *
+>>>>>>> origin/master
 from .serializers import *
 
+
+# class EventViewSet(viewsets.ModelViewSet):
+#     queryset = Event.objects.all()
+#     serializer_class = EventSerializer
+
+# class EventViewSet(viewsets.ModelViewSet):
+#     queryset = Event.objects.all()
+#     serializer_class = EventSerializer
+#     parser_classes = (MultiPartParser, FormParser)
+#     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
+#     filterset_fields = ['user__email']
+#     search_fields = ['user__email']
 
 class EmployerCompanyView(generics.CreateAPIView):
     serializer_class = EmployerCompanySerialzers
@@ -67,7 +87,7 @@ class EmployerListApiView(ListAPIView):
     filterset_fields = ['user__email']
 
     def get_queryset(self):
-        return EmployerCompany.objects.all()
+        return EmployerCompany.objects.all().select_related('user')
 
 
 class CompanyReviewView(generics.CreateAPIView):
@@ -104,15 +124,38 @@ class VacancyPagination(PageNumberPagination):
     max_page_size = 100
 
 
+class CategoryView(generics.ListAPIView):
+    queryset = Category.objects.select_related().all()
+    serializer_class = CategorySerializers
+
+    def get(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
+
+from django.db.models import Q
+
+
 class VacancyListApiView(ListAPIView):
     serializer_class = VacancySerializers
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
-    filterset_fields = ['employer_company__name', 'city','employer_company__user__email']
-    search_fields = ['name', 'extra_info','employer_company__name']
-    pagination_class = VacancyPagination  # Замените paginator на pagination_class
+    filterset_fields = ['employer_company__name', 'city', 'employer_company__user__email', 'category__name', 'subcategory__name']
+    search_fields = ['name', 'extra_info', 'employer_company__name']
+    # permission_classes = [IsAuthenticated]
+    pagination_class = VacancyPagination
 
     def get_queryset(self):
-        return Vacancy.objects.filter(is_vacancy_confirmed=True)
+        category_name = self.request.query_params.get('category__name', None)
+        subcategory_name = self.request.query_params.get('subcategory__name', None)
+
+        # Handle filtering by category and/or subcategory
+        queryset = Vacancy.objects.filter(is_vacancy_confirmed=True)
+
+        if category_name:
+            queryset = queryset.filter(category__name=category_name).select_related('category')
+
+        if subcategory_name:
+            queryset = queryset.filter(subcategory__name=subcategory_name).select_related('subcategory')
+
+        return queryset
 
 
 class VacancyListView(generics.CreateAPIView):
@@ -140,8 +183,6 @@ class VacancyListView(generics.CreateAPIView):
 
         serializer.save(user=user)
         
-
-
     def post(self, request, *args, **kwargs):
         return self.create(request, *args, **kwargs)
 
@@ -160,7 +201,7 @@ class VacancyListCreateAPIView(mixins.ListModelMixin,
                                mixins.CreateModelMixin,
                                generics.GenericAPIView):
 
-    queryset = Vacancy.objects.all()
+    queryset = Vacancy.objects.select_related('category', 'subcategory', 'employer_company__user').all()
     serializer_class = VacancyFilterSerializer
     filter_backends = (django_filters.DjangoFilterBackend, filters.OrderingFilter)
     filterset_class = VacancyFilter
@@ -172,13 +213,10 @@ class VacancyListCreateAPIView(mixins.ListModelMixin,
         return self.create(request, *args, **kwargs)
 
 
-class VacancyChangeView(mixins.RetrieveModelMixin,
-                        mixins.UpdateModelMixin,
-                        mixins.DestroyModelMixin, GenericAPIView):
-    queryset = Vacancy.objects.filter(is_vacancy_confirmed=True)
+class VacancyChangeView(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixins.DestroyModelMixin, GenericAPIView):
+    queryset = Vacancy.objects.filter(is_vacancy_confirmed=True).select_related('category', 'subcategory')
     serializer_class = VacancyChangeSerializer
     parser_classes = (MultiPartParser, FormParser)
-
 
     def get(self, request, *args, **kwargs):
         return self.retrieve(request, *args, **kwargs)
@@ -196,13 +234,17 @@ class VacancyChangeView(mixins.RetrieveModelMixin,
         return response
 
 
+
+from django.db.models import F
+
 class VacancyByEmployeeEmailAPIView(generics.ListAPIView):
-    queryset = Vacancy.objects.filter(is_vacancy_confirmed=True)
+    queryset = Vacancy.objects.filter(is_vacancy_confirmed=True).select_related('employer_company__user')
     serializer_class = VacancySerializers
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     filterset_fields = ['employer_company__user__email']
-    search_fields = ['name', 'extra_info','employer_company__name']
+    search_fields = ['name', 'extra_info', 'employer_company__name']
     pagination_class = VacancyPagination
+
 
 
 class ReviewVacancyCreateView(mixins.CreateModelMixin, generics.GenericAPIView):
@@ -228,10 +270,13 @@ class ReviewVacancyCreateView(mixins.CreateModelMixin, generics.GenericAPIView):
 
 
 class ReviewVacancyListView(ListAPIView):
-    queryset = ReviewVacancy.objects.all()
+    queryset = ReviewVacancy.objects.all().select_related('applicant_profile__user', 'employer')
     serializer_class = ReviewVacancySerializer
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
-    filterset_fields = ['status','applicant_profile__user__email', 'employer__email', 'vacancy', 'id',]
+    filterset_fields = ['status', 'applicant_profile__user__email', 'employer__email']
+
+    def get_queryset(self):
+        return self.queryset
     
 INVITATION_COMMENT = "Ваша заявка была одобрена. Мы ждем вас!"
 REJECTION_COMMENT = "К сожалению, ваша заявка была отклонена."
@@ -270,16 +315,13 @@ class NewVacancyView(ListAPIView):
     search_fields = ['name', 'extra_info']
 
     def get_queryset(self):
-     
         current_date = datetime.now()
-        
         three_days_ago = current_date - timedelta(days=3)
 
-    
         return Vacancy.objects.filter(
             is_vacancy_confirmed=True,
             created_date__range=(three_days_ago, current_date)
-        )
+        ).select_related('employer_company', 'category', 'subcategory')
 
 
 class InvitationCreateView(generics.CreateAPIView):
@@ -291,7 +333,7 @@ class InvitationCreateView(generics.CreateAPIView):
 
 
 class InvitationListView(generics.ListAPIView):
-    queryset = Invitation.objects.all()
+    queryset = Invitation.objects.select_related('user', 'vacancy', 'employer')
     serializer_class = InvatationGetSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['status','employer__user__email', 'user__email']

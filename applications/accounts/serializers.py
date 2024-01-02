@@ -1,17 +1,53 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
+from rest_framework.views import APIView
+from drf_yasg2.utils import swagger_auto_schema
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-
+from django.core.mail import send_mail
+from random import randint
 from .models import *
 from .serializers import *
 
 User = get_user_model()
 
 
+class RegistrationSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(max_length=100, required=True)
+    password2 = serializers.CharField(max_length=100, required=True)
+
+    class Meta:
+        model = User
+        fields = ('email', 'password', 'password2',)
+        extra_kwargs = {
+            'password': {'write_only': True},
+        }
+
+    def validate(self, data):
+        if data['password'] != data['password2']:
+            raise serializers.ValidationError("Пароли не совпадают.")
+        return data
+    
+
+
+    def create(self, validated_data):
+        user = User.objects.create_user(
+            email=validated_data['email'],
+            password=validated_data['password']
+        )
+
+        return user
+
+class VerifyEmailSerializer(serializers.Serializer):
+    email = serializers.EmailField(required=True)
+    verification_code = serializers.CharField(required=True, style={'input_type': 'verification_code'})
+
+
+
+
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'email', 'password')
+        fields = ('id', 'email', 'password', 'is_employer', 'is_student',)
         extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
@@ -85,13 +121,10 @@ class ProfileListSerializer(serializers.ModelSerializer):
 class UserListSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'avatar', 'email', 'phone', 'whatsapp_phone', 'is_employer', 'is_staff','is_active', 'is_superuser',)
+        fields = ('id', 'email', 'phone', 'whatsapp_phone', 'is_employer', 'is_staff','is_active', 'is_superuser',)
 
 
-class UserListPutchSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ('id', 'avatar')
+
 
 class SupportRequestSerializer(serializers.ModelSerializer):
     user = serializers.EmailField(source='user.email')
