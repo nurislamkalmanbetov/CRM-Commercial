@@ -1,10 +1,28 @@
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.db.models import Sum
-
+from django.conf import settings
 from django.utils.translation import gettext, gettext_lazy as _
 from ckeditor.fields import RichTextField
 
+
+class Event(models.Model):
+    title = models.CharField(max_length=200)
+    description = models.TextField()
+    start_time = models.DateTimeField()
+    end_time = models.DateTimeField()
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='events'
+    )
+
+    def __str__(self):
+        return self.title
+    
+    class Meta:
+        verbose_name = _('Календарь')
+        verbose_name_plural = _('Календарь')
 
 class University(models.Model):
     name = models.CharField(_('Название'), max_length=500)
