@@ -22,42 +22,109 @@ from random import randint
 
 User = get_user_model()
 
+
+
+def send_custom_email(email, subject, template_name, context):
+    html_message = render_to_string(template_name, context)
+    send_mail(
+        subject,
+        None,
+        'kalmanbetovnurislam19@gmail.com', 
+        [email],
+        html_message=html_message,
+        fail_silently=False,
+    )
+    print("Письмо отправлено")
+
 class RegistrationAPIView(generics.CreateAPIView):
     serializer_class = RegistrationSerializer
-    queryset = User.objects.all()  
 
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        if serializer.is_valid():
-            user = User.objects.filter(email=serializer.data['email']).first()
-            if user is not None:
-                return Response({"error": "Пользователь уже существует"}, status=status.HTTP_400_BAD_REQUEST)
-            user = User.objects.create_user(
-                email=serializer.data['email'],
-                password=serializer.data['password']
-            )
-            
-            verification_code = randint(1000, 9999)
+    def post(self, request, *args, **kwargs):
+        email = request.data.get('email')
+        user = User.objects.filter(email=email).first()
+
+        if user is not None and not user.is_verified_email:
+            verification_code = randint(10000, 99999)
             user.verification_code = verification_code
+            user.verification_code_created_at = timezone.now()
             user.save()
+
             context = {
                 'verification_code': verification_code,
-                
             }
-          
-            html_message = render_to_string('email_template.html', context)
-            
-          
-            subject = 'Подтверждение регистрации'
-            recipient_list = [user.email]  
-            send_mail(subject, None, 'kalmanbetovnurislam19@gmail.com', recipient_list, html_message=html_message, fail_silently=False)
-            print("ok")
+
+            send_custom_email(
+                user.email,
+                'Подтверждение регистрации',
+                'email_template.html',
+                context
+            )
 
             return Response({
-                "messsage": "Успешная регистрация",
                 "user": user.email,
+                "status": status.HTTP_200_OK
+            })
+
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            user = User.objects.filter(email=serializer.validated_data['email']).first()
+
+            if user is not None and user.is_verified_email:
+                return Response({"error": "Пользователь уже существует"}, status=status.HTTP_400_BAD_REQUEST)
+
+            user = User.objects.create(
+                email=serializer.validated_data['email'],
+            )
+
+            verification_code = randint(10000, 99999)
+            user.verification_code = verification_code
+            user.verification_code_created_at = timezone.now()
+            user.save()
+
+            context = {
+                'verification_code': verification_code,
+            }
+
+            send_custom_email(
+                user.email,
+                'Подтверждение регистрации',
+                'email_template.html',
+                context
+            )
+
+            return Response({
+                "user": user.email,
+                "status": status.HTTP_201_CREATED
             })
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class ResetPasswordAPIView(APIView):
+    def post(self, request, *args, **kwargs):
+        email = request.data.get('email')
+        user = User.objects.filter(email=email).first()
+
+        if user is None:
+            return Response({"error": "Пользователь не найден"}, status=status.HTTP_404_NOT_FOUND)
+
+        verification_code = randint(10000, 99999)
+        user.verification_code = verification_code
+        user.verification_code_created_at = timezone.now()
+        user.save()
+        context = {
+            'verification_code': verification_code,
+        }
+
+        send_custom_email(
+            user.email,
+            'Сброс пароля',
+            'email_template.html',
+            context
+        )
+
+        return Response({
+            "user": user.email,
+            "status": status.HTTP_200_OK
+        })
 
 
 

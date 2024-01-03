@@ -2,18 +2,12 @@ from django.urls import path, include
 from .views import *
 from rest_framework.routers import DefaultRouter
 
-router = DefaultRouter()
-router.register(r'events', EventViewSet)
 
 # router = DefaultRouter()
 # router.register(r'events', EventViewSet)
 
 urlpatterns = [
-<<<<<<< HEAD
-    path('calendar/', include(router.urls)),
-=======
     # path('calendar/', include(router.urls)),
->>>>>>> origin/master
     path('employer-company-create/', EmployerCompanyView.as_view(), name='employer-company'),
     path('employer-company-list/', EmployerListApiView.as_view(), name='employer-company-list'),
     path('employer-company-change-detail/<int:pk>/', EmployerCompanyMixins.as_view(), name='employer-company-change-detail'),

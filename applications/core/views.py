@@ -11,16 +11,11 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
-<<<<<<< HEAD
-from rest_framework import viewsets
-from .models import Vacancy, Event
-=======
 from rest_framework.permissions import IsAuthenticated
 
 from rest_framework import viewsets
 # from schedule.models import Event
 from .models import *
->>>>>>> origin/master
 from .serializers import *
 
 
@@ -376,10 +371,10 @@ class ModeratedFeedbackListView(generics.ListAPIView):
 #             queryset = queryset.filter(creator__email=email)
 #         return queryset
     
-class EventViewSet(viewsets.ModelViewSet):
-    queryset = Event.objects.all()
-    serializer_class = EventSerializer
-    parser_classes = (MultiPartParser, FormParser)
-    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
-    filterset_fields = ['user__email']
-    search_fields = ['user__email']
+# class EventViewSet(viewsets.ModelViewSet):
+#     queryset = Event.objects.all()
+#     serializer_class = EventSerializer
+#     parser_classes = (MultiPartParser, FormParser)
+#     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
+#     filterset_fields = ['user__email']
+#     search_fields = ['user__email']

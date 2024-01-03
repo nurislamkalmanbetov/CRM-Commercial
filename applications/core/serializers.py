@@ -5,10 +5,6 @@ from applications.accounts.serializers import ProfileListSerializer
 from .models import *
 from django.contrib.auth import get_user_model
 # from schedule.models import Event
-<<<<<<< HEAD
-
-=======
->>>>>>> origin/master
 
 
 
@@ -16,32 +12,6 @@ User = get_user_model()
 
 
 # class EventSerializer(serializers.ModelSerializer):
-<<<<<<< HEAD
-#     creator_email = serializers.EmailField(write_only=True)
-
-#     class Meta:
-#         model = Event
-#         fields = ['id', 'title', 'start', 'end', 'description', 'creator', 'creator_email']
-    
-#     def validate_creator_email(self, value):
-#         try:
-#             user = User.objects.get(email=value)
-#             return user
-#         except User.DoesNotExist:
-#             raise serializers.ValidationError("User with this email does not exist")
-
-#     def create(self, validated_data):
-#         creator_email = validated_data.pop('creator_email')
-#         user = self.validate_creator_email(creator_email)
-#         event = Event.objects.create(creator=user, **validated_data)
-#         return event
-
-#     def update(self, instance, validated_data):
-#         creator_email = validated_data.pop('creator_email', None)
-#         if creator_email:
-#             user = self.validate_creator_email(creator_email)
-#             instance.creator = user
-=======
 #     class Meta:
 #         model = Event
 #         fields = ['id', 'calendar','title', 'start', 'end', 'description', 'creator']
@@ -64,78 +34,11 @@ User = get_user_model()
 #         if user_email:
 #             user = User.objects.get(email=user_email)
 #             instance.user = user
->>>>>>> origin/master
 #         for attr, value in validated_data.items():
 #             setattr(instance, attr, value)
 #         instance.save()
 #         return instance
 
-<<<<<<< HEAD
-# class EventSerializer(serializers.ModelSerializer):
-#     creator_email = serializers.EmailField(write_only=True)
-#     calendar = serializers.PrimaryKeyRelatedField(queryset=Calendar.objects.all(), allow_null=True, required=False)
-
-#     class Meta:
-#         model = Event
-#         fields = ['id', 'calendar', 'title', 'start', 'end', 'description', 'creator', 'creator_email']
-    
-#     def validate_creator_email(self, value):
-#         try:
-#             user = User.objects.get(email=value)
-#             return user
-#         except User.DoesNotExist:
-#             raise serializers.ValidationError("User with this email does not exist")
-
-#     def create(self, validated_data):
-#         creator_email = validated_data.pop('creator_email')
-#         user = self.validate_creator_email(creator_email)
-
-#         calendar = validated_data.get('calendar')
-#         if not calendar:
-#             calendar = Calendar.objects.first()
-#             if not calendar:
-#                 raise serializers.ValidationError("No calendar available")
-
-#         event = Event.objects.create(creator=user, calendar=calendar, **validated_data)
-#         return event
-
-#     def update(self, instance, validated_data):
-#         creator_email = validated_data.pop('creator_email', None)
-#         if creator_email:
-#             user = self.validate_creator_email(creator_email)
-#             instance.creator = user
-
-#         for attr, value in validated_data.items():
-#             setattr(instance, attr, value)
-#         instance.save()
-#         return instance
-
-class EventSerializer(serializers.ModelSerializer):
-    user_email = serializers.EmailField(write_only=True)
-
-    class Meta:
-        model = Event
-        fields = ['id', 'title', 'description', 'start_time', 'end_time', 'user_email']
-
-    def create(self, validated_data):
-        user_email = validated_data.pop('user_email')
-        user = User.objects.get(email=user_email)
-        event = Event.objects.create(user=user, **validated_data)
-        return event
-
-    def update(self, instance, validated_data):
-        user_email = validated_data.pop('user_email', None)
-        if user_email:
-            user = User.objects.get(email=user_email)
-            instance.user = user
-        for attr, value in validated_data.items():
-            setattr(instance, attr, value)
-        instance.save()
-        return instance
-
-
-=======
->>>>>>> origin/master
 class InvitationSerializer(serializers.ModelSerializer):
     user_email = serializers.EmailField(write_only=True)
     vacancy_id = serializers.PrimaryKeyRelatedField(queryset=Vacancy.objects.all(), write_only=True)
